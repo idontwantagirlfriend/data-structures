@@ -13,6 +13,8 @@ public abstract class AbstractIntLinkedList {
 
     public abstract int removeLast();
 
+    public abstract int removeAt(int position);
+
     public abstract int size();
 
     public abstract int getFirst();

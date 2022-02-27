@@ -13,6 +13,8 @@ public abstract class AbstractLinkedList<T> implements Iterable<T> {
 
     public abstract T removeLast();
 
+    public abstract T removeAt(int position);
+
     public abstract int size();
 
     public abstract T getFirst();

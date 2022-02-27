@@ -1,6 +1,7 @@
 package com.idontwantagirlfriend.LinkedList;
 
 import java.util.Iterator;
+import java.util.function.Function;
 
 /**
  *  An implementation of one-way linked list.
@@ -117,12 +118,95 @@ public class LinkedList<T> extends AbstractLinkedList<T> {
             first = last = null;
         } else {
             var cursorNode = first;
-            while (cursorNode.getNext().hasNext()) cursorNode = cursorNode.getNext();
+            while (cursorNode.getNext().hasNext())
+                cursorNode = cursorNode.getNext();
             cursorNode.setNext(null);
             last = cursorNode;
         }
 
         return removed;
+    }
+
+    /**
+     * Remove item at a given position in the list.<br/>
+     * O(n) time complexity.
+     * @param position
+     * @return the removed item.
+     * @throws IllegalStateException on negative position
+     * @throws IndexOutOfBoundsException on excessive position
+     */
+    @Override
+    public T removeAt(int position) {
+        if (position < 0)
+            throw new IllegalArgumentException(
+                "Removal position must be non-negative.");
+        var reportIndexOutOfBoundsException = (Function<Integer, T>) index -> {
+            throw new IndexOutOfBoundsException(
+                    "You were trying to remove an item at position"
+                            + index
+                            + "while the maximum index is"
+                            + size());
+        };
+
+        if (isEmpty()) reportIndexOutOfBoundsException.apply(position);
+
+        var cursorNode = first;
+
+        for (var i = 0; i < position - 1; i++) {
+            if (!cursorNode.hasNext()) {
+                return reportIndexOutOfBoundsException.apply(position);
+            }
+            cursorNode = cursorNode.getNext();
+        }
+
+//        Cursor arrives at the node right before the removed one.
+//        It shifts forward [position - 1] times. When (position = 0),
+//        the cursor won't shift.
+//        [cursor]  =>  removed  => next
+
+        if (position == 0) {
+            first = cursorNode.getNext();
+//            Case 1: remove the first node, no need to care about
+//            unbinding the previous node.
+            if (!cursorNode.hasNext()) {
+                last = null;
+            } else {
+                cursorNode.setNext(null);
+            }
+            return cursorNode.get();
+        }
+
+//        Case 2: remove a node in the middle, we should be arriving
+//        right before the removed one.
+//                    [position]
+//                        ||
+//        [cursor]  =>  removed  => next
+        if (!cursorNode.hasNext()) {
+//            Case 2.1: the node at [position] doesn't exist,
+//            throw new IndexOutOfBoundException.
+            return reportIndexOutOfBoundsException.apply(position);
+        }
+
+        var removedNode = cursorNode.getNext();
+
+        if (!removedNode.hasNext()) {
+//            Case 2.2: the removed node being the last node,
+//            overwrite [last] with [cursor]
+//                  [position], [last]
+//                            ||
+//            [cursor]  <=>  removed
+            cursorNode.setNext(null);
+            last = cursorNode;
+        } else {
+//            Case 2.3: the removed node isn't the last node
+//            (default situation), then unset previous and next for
+//            the surrounding nodes.
+            var afterNode = removedNode.getNext();
+            removedNode.setNext(null);
+            cursorNode.setNext(afterNode);
+        }
+
+        return removedNode.get();
     }
 
     @Override

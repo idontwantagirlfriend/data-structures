@@ -110,6 +110,28 @@ public class ArrayLinkedList<T> extends AbstractLinkedList<T> {
     }
 
     /**
+     * Remove item at a given position in the list.<br/>
+     * O(1) time complexity. Internally involves lookup in an array.
+     * @param position
+     * @return the removed item.
+     * @throws IllegalStateException on negative position
+     * @throws IndexOutOfBoundsException on excessive position
+     */
+    @Override
+    public T removeAt(int position) {
+        if (position < 0)
+            throw new IllegalArgumentException(
+                    "Removal position must be non-negative.");
+        if (position > size() - 1)
+            throw new IndexOutOfBoundsException(
+                    "You were trying to remove an item at position"
+                            + position
+                            + "while the maximum index is"
+                            + size());
+        return items.removeAt(position);
+    }
+
+    /**
      * Read the internally kept size field.<br/>
      * O(1) time complexity.
      * @return
