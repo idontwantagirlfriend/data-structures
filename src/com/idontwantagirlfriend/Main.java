@@ -1,0 +1,7 @@
+package com.idontwantagirlfriend;
+
+public class Main {
+    public static void main(String[] args) {
+        assert false;
+    }
+}
