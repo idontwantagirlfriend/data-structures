@@ -43,6 +43,8 @@ public class IntArray extends AbstractIntArray {
      * with {@code number} in this array.<br/>
      * O(1) time complexity.
      * @return the replaced {@code number}.
+     * @throws IllegalStateException on negative index
+     * @throws IndexOutOfBoundsException on excessive index
      */
     @Override
     public int replace(int index, int number) {
@@ -59,6 +61,8 @@ public class IntArray extends AbstractIntArray {
      * shift all numbers after it by 1 position.<br/>
      * O(n) time complexity.
      * @return {@code number} inserted.
+     * @throws IllegalStateException on negative index
+     * @throws IndexOutOfBoundsException on excessive index
      */
     @Override
     public int insertBefore(int index, int number) {
@@ -78,6 +82,8 @@ public class IntArray extends AbstractIntArray {
      * and decrement {@code bound} by 1.<br/>
      * O(n) time complexity
      * @return the removed number.
+     * @throws IllegalStateException on negative index
+     * @throws IndexOutOfBoundsException on excessive index
      */
     @Override
     public int removeAt(int index) {

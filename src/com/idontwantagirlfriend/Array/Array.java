@@ -42,11 +42,13 @@ public class Array<T> extends AbstractArray<T>{
     }
 
     /**
- * replace: replace the member at {@code index}
- * with {@code element} in this.array.<br/>
- * O(1) time complexity.
- * @return the replaced {@code element}.
- */
+     * replace: replace the member at {@code index}
+     * with {@code element} in this.array.<br/>
+     * O(1) time complexity.
+     * @return the replaced {@code element}.
+     * @throws IllegalStateException on negative index
+     * @throws IndexOutOfBoundsException on excessive index
+     */
     @Override
     public T replace(int index, T element) {
         handleNegativeIndex(index);
@@ -62,6 +64,8 @@ public class Array<T> extends AbstractArray<T>{
      * shift all elements after it by 1 position.<br/>
      * O(n) time complexity.
      * @return {@code element} inserted.
+     * @throws IllegalStateException on negative index
+     * @throws IndexOutOfBoundsException on excessive index
      */
     @Override
     public T insertBefore(int index, T element) {
@@ -81,6 +85,8 @@ public class Array<T> extends AbstractArray<T>{
      * and decrement {@code bound} by 1.<br/>
      * O(n) time complexity
      * @return the removed element.
+     * @throws IllegalStateException on negative index
+     * @throws IndexOutOfBoundsException on excessive index
      */
     @Override
     public T removeAt(int index) {
@@ -107,6 +113,8 @@ public class Array<T> extends AbstractArray<T>{
  * O(n) time complexity. Involves single traversal
  * of array.
  * @return an index (Integer).
+ * @throws IllegalStateException on negative index
+ * @throws IndexOutOfBoundsException on excessive index
  */
     @Override
     public int indexOf(T searchItem) {
@@ -122,7 +130,9 @@ public class Array<T> extends AbstractArray<T>{
      * If the index is negative, throw IllegalArgumentException.<br/>
      * O(1) time complexity.
      * @param index
-     * @return
+     * @return the item at {@index} position
+     * @throws IllegalStateException on negative index
+     * @throws IndexOutOfBoundsException on excessive index
      */
     @Override
     public T get(int index) {
