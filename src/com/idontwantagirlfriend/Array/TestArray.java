@@ -38,15 +38,27 @@ public class TestArray {
         }
 
         @Test
-        public void insertMultipleElementsAndGetByIndex_ShouldAllReturnRightElements() {
-            arr.insert(4);
-            arr.insert(89);
-            arr.insert(492);
+        public void insertMultipleElementsAndGet_ShouldAllReturnRightElements() {
+            arr.insert(0);
+            arr.insert(1);
             arr.insert(10);
-            assertEquals(4, arr.get(0));
-            assertEquals(89, arr.get(1));
-            assertEquals(492, arr.get(2));
-            assertEquals(10, arr.get(3));
+            arr.insert(11);
+            arr.insert(100);
+            arr.insert(101);
+            arr.insert(110);
+            arr.insert(111);
+            arr.insert(1000);
+            arr.insert(1001);
+            assertEquals(0, arr.get(0));
+            assertEquals(1, arr.get(1));
+            assertEquals(10, arr.get(2));
+            assertEquals(11, arr.get(3));
+            assertEquals(100, arr.get(4));
+            assertEquals(101, arr.get(5));
+            assertEquals(110, arr.get(6));
+            assertEquals(111, arr.get(7));
+            assertEquals(1000, arr.get(8));
+            assertEquals(1001, arr.get(9));
         }
     }
 
