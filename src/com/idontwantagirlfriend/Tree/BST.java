@@ -1,6 +1,7 @@
 package com.idontwantagirlfriend.Tree;
 
-public class BST<E extends Comparable<E>> implements Tree<E> {
+public class BST<E extends Comparable<E>> extends AbstractTree<E> {
+
     private Node root;
 
     @Override
@@ -57,55 +58,54 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
                 height(node.getRight()));
     }
 
+    public Boolean equals(BST<E> tree) {
+        if (root == null) return tree.getRoot() == null;
+
+        return root.equals(tree.getRoot());
+    }
+
+    private Node getRoot() {
+        return root;
+    }
+
+    public void traversePreOrder() {
+        traversePreOrder(root);
+    }
+
+    private void traversePreOrder(Node node) {
+        if (node == null) return;
+
+        System.out.println(node.get());
+        traversePreOrder(node.getLeft());
+        traversePreOrder(node.getRight());
+    }
+
+    public void traverseInOrder() {
+        traverseInOrder(root);
+    }
+
+    private void traverseInOrder(Node node) {
+        if (node == null) return;
+
+        traverseInOrder(node.getLeft());
+        System.out.println(node.get());
+        traverseInOrder(node.getRight());
+    }
+
+    public void traversePostOrder() {
+        traversePostOrder(root);
+    }
+
+    private void traversePostOrder(Node node) {
+        if (node == null) return;
+
+        traversePostOrder(node.getLeft());
+        traversePostOrder(node.getRight());
+        System.out.println(node.get());
+    }
+
     @Override
     public String toString() {
         return root.toString();
-    }
-
-    private class Node {
-        private Node left;
-        private Node right;
-        private E value;
-
-        public Node(E value) {
-            this.value = value;
-        }
-
-        public Boolean hasLeft() {
-            return left != null;
-        }
-
-        public Boolean hasRight() {
-            return right != null;
-        }
-
-        public E get() {
-            return this.value;
-        }
-
-        public Node getLeft() {
-            return left;
-        }
-
-        public void setLeft(Node left) {
-            this.left = left;
-        }
-
-        public Node getRight() {
-            return right;
-        }
-
-        public void setRight(Node right) {
-            this.right = right;
-        }
-
-        @Override
-        public String toString() {
-            if (!this.hasLeft() && !this.hasRight()) return "[" + value.toString() + "]";
-//            In-order traversal
-            var leftString = hasLeft() ? left.toString() : "null";
-            var rightString = hasRight() ? right.toString() : "null";
-            return "[" + value.toString() + ", " + leftString + ", " + rightString + "]";
-        }
     }
 }

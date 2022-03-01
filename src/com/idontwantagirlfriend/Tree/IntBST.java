@@ -1,8 +1,9 @@
 package com.idontwantagirlfriend.Tree;
 
-public class IntBST {
+public class IntBST extends AbstractIntTree{
     private Node root;
 
+    @Override
     public void insert(int element) {
         if (root == null) {
             root = new Node(element);
@@ -26,6 +27,7 @@ public class IntBST {
         }
     }
 
+    @Override
     public Boolean find(int element) {
         if (root == null) return false;
 
@@ -41,8 +43,16 @@ public class IntBST {
         return false;
     }
 
+
+    @Override
     public int height() {
         return height(root);
+    }
+
+    public Boolean equals(IntBST tree) {
+        if (root == null) return tree.getRoot() == null;
+
+        return root.equals(tree.getRoot());
     }
 
     private int height(Node node) {
@@ -60,50 +70,7 @@ public class IntBST {
         return root.toString();
     }
 
-    private static class Node {
-        private Node left;
-        private Node right;
-        private int value;
-
-        public Node(int value) {
-            this.value = value;
-        }
-
-        public Boolean hasLeft() {
-            return left != null;
-        }
-
-        public Boolean hasRight() {
-            return right != null;
-        }
-
-        public int get() {
-            return this.value;
-        }
-
-        public Node getLeft() {
-            return left;
-        }
-
-        public void setLeft(Node left) {
-            this.left = left;
-        }
-
-        public Node getRight() {
-            return right;
-        }
-
-        public void setRight(Node right) {
-            this.right = right;
-        }
-
-        @Override
-        public String toString() {
-            if (!this.hasLeft() && !this.hasRight()) return "[" + value + "]";
-//            In-order traversal
-            var leftString = hasLeft() ? left.toString() : "null";
-            var rightString = hasRight() ? right.toString() : "null";
-            return "[" + value + ", " + leftString + ", " + rightString + "]";
-        }
+    public Node getRoot() {
+        return root;
     }
 }
