@@ -6,6 +6,55 @@ import java.util.function.Consumer;
 public class AVLTree<E extends Comparable<E>> implements Tree<E> {
     private Node root;
 
+    @Override
+    public void insert(E element) {
+
+        BiConsumer<Node, Consumer<Node>> adaptedUpdateNodeHeight
+                = (node, parentRebind) -> softUpdateNodeHeight(node);
+
+        if (root == null) {
+            root = new Node(element);
+        } else {
+            var node = traverseTheTreeAndGetTheRelevantNode(
+                    element);
+            if (element.compareTo(node.get()) <= 0) {
+                node.setLeft(new Node(element));
+            } else if (element.compareTo(node.get()) > 0) {
+                node.setRight(new Node(element));
+            }
+
+            traverseTheTreeAndGetTheRelevantNode(
+                    element, adaptedUpdateNodeHeight.andThen(this::rotateWhenNeeded));
+        }
+    }
+
+    @Override
+    public int height() {
+        if (root == null) return -1;
+        return root.getHeight();
+    }
+
+    @Override
+    public String toString() {
+        return root.toString();
+    }
+
+    public Boolean equals(AVLTree<E> tree2) {
+        if (root == null && tree2.getRoot() == null) return true;
+        if (root == null || tree2.getRoot() == null) return false;
+        return root.equals(tree2.getRoot());
+    }
+
+    public Node getRoot() {
+        return root;
+    }
+
+
+    public void setRoot(Node root) {
+        this.root = root;
+    }
+
+
     private void softUpdateNodeHeight(Node node) {
         var leftHeight
                 = (!node.hasLeft())
@@ -43,28 +92,6 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
         }
     }
 
-
-    @Override
-    public void insert(E element) {
-
-        BiConsumer<Node, Consumer<Node>> adaptedUpdateNodeHeight
-                = (node, parentRebind) -> softUpdateNodeHeight(node);
-
-        if (root == null) {
-            root = new Node(element);
-        } else {
-            var node = traverseTheTreeAndGetTheRelevantNode(
-                    element);
-            if (element.compareTo(node.get()) < 0) {
-                node.setLeft(new Node(element));
-            } else if (element.compareTo(node.get()) > 0) {
-                node.setRight(new Node(element));
-            }
-
-            traverseTheTreeAndGetTheRelevantNode(
-                    element, adaptedUpdateNodeHeight.andThen(this::rotateWhenNeeded));
-        }
-    }
 
     private Node traverseTheTreeAndGetTheRelevantNode(E element, BiConsumer<Node, Consumer<Node>> hookedCallback) {
         return traverseTheSubtreeAndGetTheRelevantNode(root, element, null, hookedCallback);
@@ -114,6 +141,18 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
         return relevantNode;
     }
 
+    /**
+     * The recursion from {@code traverseTheSubtreeAndGetTheRelevantNode}
+     * continues here and practically ends here, and the callback
+     * function is fired based on the lastNode provided from the last layer
+     * of recursion.
+     * @param node
+     * @param element
+     * @param lastNode
+     * @param hookedCallback a callback function on the current node and
+     *                       the last node.
+     * @return
+     */
     private Node traverseTheRightSubtreeAndGetTheRelevantNode(Node node, E element, Node lastNode, BiConsumer<Node, Consumer<Node>> hookedCallback) {
         var relevantNode = (!node.hasRight())
                 ? node
@@ -123,18 +162,30 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
         return relevantNode;
     }
 
+    /**
+     * Create a consumer that will bind a node to the
+     * left / right position of lastNode depending on the position
+     * of the current node. <br/>
+     * Without this rebinding process, the rotated nodes will run into chaotic
+     * relationships after each rotation.
+     * @param node
+     * @param lastNode
+     * @return a binding function for each node to rotate
+     */
     private Consumer<Node> createHookedCallback(Node node, Node lastNode) {
-//      Create a consumer that will bind a node to the
-//      left / right position of lastNode depending on the position
-//      of the current node.
-//      Without this rebinding process, the rotated nodes will run into chaotic
-//      relationships after each rotation.
         if (lastNode == null) return this::setRoot;
         return node == lastNode.getLeft()
         ? lastNode::setLeft
         : lastNode::setRight;
     }
 
+    /**
+     * Traverse the tree and execute a function on each node.
+     * Similar to {@code Stream.peek}.
+     * @param element
+     * @param callback
+     * @return the most "relevant" node to insert the element onto
+     */
     private Node traverseTheTreeAndGetTheRelevantNode(E element, Consumer<Node> callback) {
         if (root == null) return null;
         return traverseTheSubtreeAndGetTheRelevantNode(root, element, callback);
@@ -155,7 +206,7 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
         var relevantNode = (!node.hasLeft())
                 ? node
                 : traverseTheSubtreeAndGetTheRelevantNode(node.getLeft(), element, callback);
-        callback.accept(relevantNode);
+        callback.accept(node);
         return relevantNode;
     }
 
@@ -163,12 +214,11 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
         var relevantNode = (!node.hasRight())
                 ? node
                 : traverseTheSubtreeAndGetTheRelevantNode(node.getRight(), element, callback);
-        callback.accept(relevantNode);
+        callback.accept(node);
         return relevantNode;
     }
 
-    public Node traverseTheTreeAndGetTheRelevantNode(E element) {
-        if (root == null) return null;
+    private Node traverseTheTreeAndGetTheRelevantNode(E element) {
         return traverseTheSubtreeAndGetTheRelevantNode(root, element);
     }
 
@@ -211,14 +261,14 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
         parentRebind.accept(null);
 
         var leftNode = node.getLeft();
-        node.setLeft(null);
-        if (leftNode.hasRight()) node.setLeft(leftNode.getRight());
+        node.setLeft(leftNode.getRight());
         leftNode.setRight(node);
 
         parentRebind.accept(leftNode);
 
+        // the height of leftNode will not change before and after
+        // this rotation. Mathematically provable.
         softUpdateNodeHeight(node);
-        softUpdateNodeHeight(leftNode);
     }
 
     /**
@@ -234,14 +284,14 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
         parentRebind.accept(null);
 
         var rightNode = node.getRight();
-        node.setRight(null);
-        if (rightNode.hasLeft()) node.setRight(rightNode.getLeft());
+        node.setRight(rightNode.getLeft());
         rightNode.setLeft(node);
 
         parentRebind.accept(rightNode);
 
+        // the height of rightNode will not change before and after
+        // this rotation. Mathematically provable.
         softUpdateNodeHeight(node);
-        softUpdateNodeHeight(rightNode);
     }
 
     /**
@@ -288,27 +338,6 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
         } else return find(node.getRight(), element);
     }
 
-    @Override
-    public int height() {
-        if (root == null) return -1;
-        return root.getHeight();
-    }
-
-    @Override
-    public String toString() {
-        return root.toString();
-    }
-
-    public Boolean equals(AVLTree<E> tree2) {
-        if (root == null && tree2.getRoot() == null) return true;
-        if (root == null || tree2.getRoot() == null) return false;
-        return root.equals(tree2.getRoot());
-    }
-
-    public Node getRoot() {
-        return root;
-    }
-
     private int balanceFactor(Node node) {
         var leftHeight 
                 = node.hasLeft()
@@ -319,10 +348,6 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
                 ? node.getRight().getHeight()
                 : -1;
         return leftHeight - rightHeight;
-    }
-
-    public void setRoot(Node root) {
-        this.root = root;
     }
 
     private class Node {
@@ -376,10 +401,10 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
             var selfEqual = value == node.get();
 
             var leftEqual = (left == null)
-                    ? node.getLeft() == null
+                    ? null == node.getLeft()
                     : left.equals(node.getLeft());
             var rightEqual = (right == null)
-                    ? node.getRight() == null
+                    ? null == node.getRight()
                     : right.equals(node.getRight());
             return selfEqual && leftEqual && rightEqual;
         }
