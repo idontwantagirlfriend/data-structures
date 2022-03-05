@@ -1,26 +1,296 @@
 package com.idontwantagirlfriend.Tree;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class AVLTree<E extends Comparable<E>> implements Tree<E> {
     private Node root;
-    
-    @Override
-    public void insert(E element) {
-        insertOnly(element);
-        hardUpdateHeight(root);
-        detectRotation();
-        hardUpdateHeight(root);
+
+    private void softUpdateNodeHeight(Node node) {
+        var leftHeight
+                = (!node.hasLeft())
+                ? -1
+                : node.getLeft().getHeight();
+        var rightHeight
+                = (!node.hasRight())
+                ? -1
+                : node.getRight().getHeight();
+        node.setHeight(
+                Math.max(leftHeight, rightHeight) + 1
+        );
+    }
+
+    /**
+     * Depending on the node position and the rebind method provided
+     * by traversal methods, fire the actual rotation methods.
+     * @param node
+     * @param parentRebind A callback function that can update the parent
+     *                    node's left/right child after each rotation.
+     */
+    private void rotateWhenNeeded(Node node, Consumer<Node> parentRebind) {
+        if (balanceFactor(node) > 1) {
+            if (balanceFactor(node.getLeft()) > 0) {
+                performLLOn(node, parentRebind);
+            } else {
+                performLROn(node, parentRebind);
+            }
+        } else if (balanceFactor(node) < -1) {
+            if (balanceFactor(node.getRight()) > 0) {
+                performRLOn(node, parentRebind);
+            } else {
+                performRROn(node, parentRebind);
+            }
+        }
     }
 
 
     @Override
+    public void insert(E element) {
+
+        BiConsumer<Node, Consumer<Node>> adaptedUpdateNodeHeight
+                = (node, parentRebind) -> softUpdateNodeHeight(node);
+
+        if (root == null) {
+            root = new Node(element);
+        } else {
+            var node = traverseTheTreeAndGetTheRelevantNode(
+                    element);
+            if (element.compareTo(node.get()) < 0) {
+                node.setLeft(new Node(element));
+            } else if (element.compareTo(node.get()) > 0) {
+                node.setRight(new Node(element));
+            }
+
+            traverseTheTreeAndGetTheRelevantNode(
+                    element, adaptedUpdateNodeHeight.andThen(this::rotateWhenNeeded));
+        }
+    }
+
+    private Node traverseTheTreeAndGetTheRelevantNode(E element, BiConsumer<Node, Consumer<Node>> hookedCallback) {
+        return traverseTheSubtreeAndGetTheRelevantNode(root, element, null, hookedCallback);
+    }
+
+    /**
+     * Traverse the subtree recursively.
+     * @param node
+     * @param element
+     * @param lastNode the parent node of this subtree
+     * @param hookedCallback  A callback function on each node,
+     *                        but involves information
+     *                        about {@code lastNode}. In this case,
+     *                        We need to update the parent node's
+     *                        left/right child after each rotation.
+     * @return The "relevant" node upon each recursion.
+     */
+    private Node traverseTheSubtreeAndGetTheRelevantNode(Node node, E element, Node lastNode, BiConsumer<Node, Consumer<Node>> hookedCallback) {
+        var shouldBeInsertedOnTheLeft
+                = element.compareTo(node.get()) <= 0;
+        if (shouldBeInsertedOnTheLeft) {
+            return traverseTheLeftSubtreeAndGetTheRelevantNode(node, element, lastNode, hookedCallback);
+        } else {
+            return traverseTheRightSubtreeAndGetTheRelevantNode(node, element, lastNode, hookedCallback);
+        }
+    }
+
+
+    /**
+     * The recursion from {@code traverseTheSubtreeAndGetTheRelevantNode}
+     * continues here and practically ends here, and the callback
+     * function is fired based on the lastNode provided from the last layer
+     * of recursion.
+     * @param node
+     * @param element
+     * @param lastNode
+     * @param hookedCallback a callback function on the current node and
+     *                       the last node.
+     * @return
+     */
+    private Node traverseTheLeftSubtreeAndGetTheRelevantNode(Node node, E element, Node lastNode, BiConsumer<Node, Consumer<Node>> hookedCallback) {
+        var relevantNode = (!node.hasLeft())
+                ? node
+                : traverseTheSubtreeAndGetTheRelevantNode(node.getLeft(), element, node, hookedCallback);
+        Consumer<Node> hook = createHookedCallback(node, lastNode);
+        hookedCallback.accept(node, hook);
+        return relevantNode;
+    }
+
+    private Node traverseTheRightSubtreeAndGetTheRelevantNode(Node node, E element, Node lastNode, BiConsumer<Node, Consumer<Node>> hookedCallback) {
+        var relevantNode = (!node.hasRight())
+                ? node
+                : traverseTheSubtreeAndGetTheRelevantNode(node.getRight(), element, node, hookedCallback);
+        Consumer<Node> hook = createHookedCallback(node, lastNode);
+        hookedCallback.accept(node, hook);
+        return relevantNode;
+    }
+
+    private Consumer<Node> createHookedCallback(Node node, Node lastNode) {
+//      Create a consumer that will bind a node to the
+//      left / right position of lastNode depending on the position
+//      of the current node.
+//      Without this rebinding process, the rotated nodes will run into chaotic
+//      relationships after each rotation.
+        if (lastNode == null) return this::setRoot;
+        return node == lastNode.getLeft()
+        ? lastNode::setLeft
+        : lastNode::setRight;
+    }
+
+    private Node traverseTheTreeAndGetTheRelevantNode(E element, Consumer<Node> callback) {
+        if (root == null) return null;
+        return traverseTheSubtreeAndGetTheRelevantNode(root, element, callback);
+    }
+
+    private Node traverseTheSubtreeAndGetTheRelevantNode(Node node, E element, Consumer<Node> callback) {
+        var shouldBeInsertedOnTheLeft
+                = element.compareTo(node.get()) <= 0;
+        if (shouldBeInsertedOnTheLeft) {
+            return traverseTheLeftSubtreeAndGetTheRelevantNode(node, element, callback);
+        } else {
+            return traverseTheRightSubtreeAndGetTheRelevantNode(node, element, callback);
+        }
+    }
+
+
+    private Node traverseTheLeftSubtreeAndGetTheRelevantNode(Node node, E element, Consumer<Node> callback) {
+        var relevantNode = (!node.hasLeft())
+                ? node
+                : traverseTheSubtreeAndGetTheRelevantNode(node.getLeft(), element, callback);
+        callback.accept(relevantNode);
+        return relevantNode;
+    }
+
+    private Node traverseTheRightSubtreeAndGetTheRelevantNode(Node node, E element, Consumer<Node> callback) {
+        var relevantNode = (!node.hasRight())
+                ? node
+                : traverseTheSubtreeAndGetTheRelevantNode(node.getRight(), element, callback);
+        callback.accept(relevantNode);
+        return relevantNode;
+    }
+
+    public Node traverseTheTreeAndGetTheRelevantNode(E element) {
+        if (root == null) return null;
+        return traverseTheSubtreeAndGetTheRelevantNode(root, element);
+    }
+
+    private Node traverseTheSubtreeAndGetTheRelevantNode(Node node, E element) {
+        var shouldBeInsertedOnTheLeft
+                = element.compareTo(node.get()) <= 0;
+        if (shouldBeInsertedOnTheLeft) {
+            return traverseTheLeftSubtreeAndGetTheRelevantNode(node, element);
+        } else {
+            return traverseTheRightSubtreeAndGetTheRelevantNode(node, element);
+        }
+    }
+
+
+    private Node traverseTheLeftSubtreeAndGetTheRelevantNode(Node node, E element) {
+        var relevantNode = (!node.hasLeft())
+                ? node
+                : traverseTheSubtreeAndGetTheRelevantNode(node.getLeft(), element);
+        return relevantNode;
+    }
+
+    private Node traverseTheRightSubtreeAndGetTheRelevantNode(Node node, E element) {
+        var relevantNode = (!node.hasRight())
+                ? node
+                : traverseTheSubtreeAndGetTheRelevantNode(node.getRight(), element);
+        return relevantNode;
+    }
+
+
+    /**
+     * Perform a LL rotation (single right rotation) on the given node,
+     * and afterward, fire a callback function {@code parentRebind}
+     * provided by traversal methods, as the left node is taking
+     * the position of {@code node} after each rotation, and we need to
+     * update its relationship with the parent node.
+     * @param node
+     * @param parentRebind
+     */
+    private void performLLOn(Node node, Consumer<Node> parentRebind) {
+        parentRebind.accept(null);
+
+        var leftNode = node.getLeft();
+        node.setLeft(null);
+        if (leftNode.hasRight()) node.setLeft(leftNode.getRight());
+        leftNode.setRight(node);
+
+        parentRebind.accept(leftNode);
+
+        softUpdateNodeHeight(node);
+        softUpdateNodeHeight(leftNode);
+    }
+
+    /**
+     * Perform a RR rotation (single left rotation) on the given node,
+     * and afterward, fire a callback function {@code parentRebind}
+     * provided by traversal methods, as the right node is taking
+     * the position of {@code node} after each rotation, and we need to
+     * update its relationship with the parent node.
+     * @param node
+     * @param parentRebind
+     */
+    private void performRROn(Node node, Consumer<Node> parentRebind) {
+        parentRebind.accept(null);
+
+        var rightNode = node.getRight();
+        node.setRight(null);
+        if (rightNode.hasLeft()) node.setRight(rightNode.getLeft());
+        rightNode.setLeft(node);
+
+        parentRebind.accept(rightNode);
+
+        softUpdateNodeHeight(node);
+        softUpdateNodeHeight(rightNode);
+    }
+
+    /**
+     * Double rotation on {@code node}. A RR rotation on the left child
+     * then an LL rotation on itself. For the usage of parentRebind,
+     * check up the LL and RR rotation methods.
+     * @param node
+     * @param parentRebind
+     */
+    private void performLROn(Node node, Consumer<Node> parentRebind) {
+        var leftNode = node.getLeft();
+        performRROn(leftNode, node::setLeft);
+        performLLOn(node, parentRebind);
+    }
+
+    /**
+     * Double rotation on {@code node}. An LL rotation on the left child
+     * then a RR rotation on itself. For the usage of parentRebind,
+     * check up the LL and RR rotation methods.
+     * @param node
+     * @param parentRebind
+     */
+    private void performRLOn(Node node, Consumer<Node> parentRebind) {
+        var rightNode = node.getRight();
+        performLLOn(rightNode, node::setRight);
+        performRROn(node, parentRebind);
+    }
+
+    /**
+     * Find if an element exist in the tree.
+     * @param element
+     * @return Boolean
+     */
+    @Override
     public Boolean find(E element) {
-        return null;
+        return find(root, element) != null;
+    }
+
+    private Node find(Node node, E element) {
+        if (node == null || element.compareTo(node.get()) == 0) {
+            return node;
+        } else if (element.compareTo(node.get()) < 0) {
+            return find(node.getLeft(), element);
+        } else return find(node.getRight(), element);
     }
 
     @Override
     public int height() {
+        if (root == null) return -1;
         return root.getHeight();
     }
 
@@ -37,104 +307,6 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
 
     public Node getRoot() {
         return root;
-    }
-        
-    public void insertOnly(E element) {
-        if (element == null) return;
-        var node = new Node(element);
-        if (root == null) {
-            root = node;
-        } else {
-            insertOnly(root, node);
-        }
-    }
-
-    private void insertOnly(Node baseNode, Node insertedNode) {
-        var shouldBeInsertedOnTheLeft
-                = insertedNode.get()
-                    .compareTo(baseNode.get()) <= 0;
-        if (shouldBeInsertedOnTheLeft) {
-            if (!baseNode.hasLeft()) {
-                baseNode.setLeft(insertedNode);
-                return;
-            }
-            insertOnly(baseNode.getLeft(), insertedNode);
-        } else {
-            if (!baseNode.hasRight()) {
-                baseNode.setRight(insertedNode);
-                return;
-            }
-            insertOnly(baseNode.getRight(), insertedNode);
-        }
-    }
-
-    private void hardUpdateHeight(Node node) {
-//        root node can't be null after an insertion,
-//        so no need to check node being null
-        if (node.hasLeft()) hardUpdateHeight(node.getLeft());
-        if (node.hasRight()) hardUpdateHeight(node.getRight());
-
-        softUpdateHeight(node);
-    }
-    
-    private void softUpdateHeight(Node node) {
-        var leftHeight
-                = node.hasLeft()
-                ? node.getLeft().getHeight()
-                : -1;
-        var rightHeight
-                = node.hasRight()
-                ? node.getRight().getHeight()
-                : -1;
-        node.setHeight(
-                1 + Math.max(leftHeight, rightHeight));
-    }
-
-    private void detectRotation() {
-        detectRotation(root, this::setRoot);
-    }
-
-    private void detectRotation(Node node, Consumer<Node> bindToParent) {
-        if (!node.hasLeft() && !node.hasRight()) return;
-        if (node.hasLeft())
-            detectRotation(node.getLeft(), node::setLeft);
-        if (node.hasRight())
-            detectRotation(node.getRight(), node::setRight);
-
-        int leftGreaterBy = balanceFactor(node);
-
-        if (leftGreaterBy > 1)
-            bindToParent.accept(doRightRotationAndGetNewBaseNode(node));
-        if (leftGreaterBy < -1)
-            bindToParent.accept(doLeftRotationAndGetNewBaseNode(node));
-    }
-
-    private Node doLeftRotationAndGetNewBaseNode(Node node) {
-        var rightNode = node.getRight();
-        if (rightNode.hasLeft()) {
-            var rightNodeLeftChild = rightNode.getLeft();
-            rightNode.setLeft(null);
-            rightNodeLeftChild.setRight(rightNode);
-            node.setRight(rightNodeLeftChild);
-            rightNode = rightNodeLeftChild;
-        }
-        node.setRight(null);
-        rightNode.setLeft(node);
-        return rightNode;
-    }
-
-    private Node doRightRotationAndGetNewBaseNode(Node node) {
-        var leftNode = node.getLeft();
-        if (leftNode.hasRight()) {
-            var leftNodeRightChild = leftNode.getRight();
-            leftNode.setRight(null);
-            leftNodeRightChild.setLeft(leftNode);
-            node.setLeft(leftNodeRightChild);
-            leftNode = leftNodeRightChild;
-        }
-        node.setLeft(null);
-        leftNode.setRight(node);
-        return leftNode;
     }
 
     private int balanceFactor(Node node) {
