@@ -1,6 +1,62 @@
 package com.idontwantagirlfriend.Heap;
 
 public class BinaryMaxHeap {
+    /**
+     * Convert an array to a heap in place.
+     * @param array to be converted
+     */
+    public static void heapify(int[] array) {
+        if (bubbleDown(array)) heapify(array);
+    }
+
+    private static boolean bubbleDown(int[] array) {
+        var needToHeapifyAgain = false;
+        var cursor = -1;
+        while (getFirstChildIndex(++cursor) < array.length) {
+            var largestChild = getLargestChild(array, cursor);
+            if (array[cursor] < array[largestChild]) {
+                swap(array, cursor, largestChild);
+                needToHeapifyAgain = true;
+            }
+        }
+        return needToHeapifyAgain;
+    }
+
+    private static int getLargestChild(int[] array, int index) {
+        var firstChild = getFirstChildIndex(index);
+        return (firstChild + 1 < array.length && array[firstChild + 1] > array[firstChild])
+                ? firstChild + 1
+                : firstChild;
+    }
+
+    public static Boolean isBinaryMaxHeap(int[] array) {
+        var cursor = -1;
+        while (getFirstChildIndex(++cursor) < array.length) {
+            var largestChild = getLargestChild(array, cursor);
+            if (array[cursor] < array[largestChild]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static int getKthLargest(int K, int[] array) {
+        if (K <= 0 || K >= array.length)
+            throw new IllegalArgumentException("K should be within the bounds of array.");
+        var heap = new BinaryMaxHeap();
+        for (int i : array) heap.insert(i);
+        for (int i = 0; i < K - 1; i++) {
+            heap.remove();
+        }
+        return heap.remove();
+    }
+
+    private static void swap(int[] array, int one, int another) {
+        var temp = array[one];
+        array[one] = array[another];
+        array[another] = temp;
+    }
+
     private int[] items;
     private int size;
     private int cursor;
@@ -21,11 +77,13 @@ public class BinaryMaxHeap {
         bubbleUp(cursor);
     }
 
-    public void remove() {
+    public int remove() {
         if (isEmpty()) throw new IllegalStateException("Heap is empty");
-        if (cursor != 0) items[0] = items[cursor];
+        var removed = items[0];
+        if (!isEmpty()) items[0] = items[cursor];
         cursor--;
         if (!isEmpty()) bubbleDown(0);
+        return removed;
     }
 
 
@@ -52,13 +110,11 @@ public class BinaryMaxHeap {
     }
 
     private void bubbleUp(int childIndex) {
-        if (childIndex > 0) {
-            var parentIndex = getParentIndex(childIndex);
-            if (items[childIndex] > items[parentIndex]) {
-                swapItems(childIndex, parentIndex);
-                bubbleUp(parentIndex);
-            }
-
+        if (childIndex <= 0) return;
+        var parentIndex = getParentIndex(childIndex);
+        if (items[childIndex] > items[parentIndex]) {
+            swap(childIndex, parentIndex);
+            bubbleUp(parentIndex);
         }
     }
 
@@ -67,7 +123,7 @@ public class BinaryMaxHeap {
         if (cursor < firstChildIndex) return;
         var largestChildIndex = getLargestChildIndex(parentIndex);
         if (items[parentIndex] < items[largestChildIndex]) {
-            swapItems(parentIndex, largestChildIndex);
+            swap(parentIndex, largestChildIndex);
             bubbleDown(largestChildIndex);
         }
     }
@@ -130,14 +186,12 @@ public class BinaryMaxHeap {
     }
 
 
-    private void swapItems(int childIndex, int parentIndex) {
-        var childValue = items[childIndex];
-        items[childIndex] = items[parentIndex];
-        items[parentIndex] = childValue;
+    private void swap(int one, int another) {
+        swap(items, one, another);
     }
 
     private String toString(int level) {
-        StringBuilder string = new StringBuilder();
+        var string = new StringBuilder();
         for (var i = getLevelStartingIndex(level);
              i < getLevelStartingIndex(level + 1);
              i++) {

@@ -126,5 +126,47 @@ public class TestBinaryMaxHeap {
             assertEquals(-1, BinaryMaxHeap.getParentIndex(-1));
             assertEquals(-1, BinaryMaxHeap.getFirstChildIndex(-1));
         }
+
+        @Test
+        public void heapifyEmpty_ShouldReturnEmpty() {
+            var arr = new int[] {};
+            BinaryMaxHeap.heapify(arr);
+            assertArrayEquals(new int[] {}, arr);
+        }
+
+        @Test
+        public void heapifyGivenArray() {
+            var arr = new int[] {5, 3, 8, 4, 1, 2};
+            BinaryMaxHeap.heapify(arr);
+            assertArrayEquals(new int[] {8, 4, 5, 3, 1, 2}, arr);
+        }
+
+        @Test
+        public void heapifyAscendingOrderArray() {
+            var arr = new int[] {1, 2, 3, 4, 5, 6};
+            BinaryMaxHeap.heapify(arr);
+            assertArrayEquals(new int[] {6, 5, 3, 4, 2, 1}, arr);
+        }
+
+        @Test
+        public void isMaxHeap() {
+            assertTrue(BinaryMaxHeap.isBinaryMaxHeap(new int[] {8, 4, 7, 3, 1, 5, 6}));
+            assertTrue(BinaryMaxHeap.isBinaryMaxHeap(new int[] {}));
+            assertFalse(BinaryMaxHeap.isBinaryMaxHeap(new int[] {8, 4, 7, 3, 5, 1, 6}));
+        }
+
+        @Test
+        public void getTheLargestValueOfAnArray() {
+            var arr = new int[] {5, 3, 8, 4, 1, 2};
+            assertEquals(8, BinaryMaxHeap.getKthLargest(1, arr));
+        }
+
+        @Test
+        public void getThe0thLargestValue_ShouldThrowIllegalArgumentException() {
+            var arr = new int[] {5, 3, 8, 4, 1, 2};
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> BinaryMaxHeap.getKthLargest(0, arr));
+        }
     }
 }
