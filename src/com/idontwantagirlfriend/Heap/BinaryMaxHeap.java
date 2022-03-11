@@ -80,7 +80,7 @@ public class BinaryMaxHeap {
     public int remove() {
         if (isEmpty()) throw new IllegalStateException("Heap is empty");
         var removed = items[0];
-        if (!isEmpty()) items[0] = items[cursor];
+        items[0] = items[cursor];
         cursor--;
         if (!isEmpty()) bubbleDown(0);
         return removed;

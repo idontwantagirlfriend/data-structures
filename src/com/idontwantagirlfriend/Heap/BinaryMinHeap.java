@@ -1,20 +1,35 @@
 package com.idontwantagirlfriend.Heap;
 
 public class BinaryMinHeap {
+    public static int getFirstIndexOfLevel(int level) {
+        if (level < 0) return -1;
+        return (int)Math.pow(2, level) - 1;
+    }
+
+    public static int getParentIndex(int parent) {
+        if (parent <= 0) return -1;
+        return (parent - 1) / 2;
+    }
+
+    public static int getFirstChildIndex(int parent) {
+        if (parent < 0) return -1;
+        return 2 * parent + 1;
+    }
+
     private int[] array;
     private int size;
     private int cursor;
-    
+
     public BinaryMinHeap() {
         this(7);
     }
-    
+
     public BinaryMinHeap(int capacity) {
         array = new int[capacity];
         this.size = capacity;
         this.cursor = -1;
     }
-    
+
     public void insert(int value) {
         resizeWhenNeeded(++cursor + 1);
         array[cursor] = value;
@@ -22,8 +37,8 @@ public class BinaryMinHeap {
     }
 
     public int remove() {
-        if (isEmpty()) throw new IllegalStateException("Minimum heap is empty, can't remove.");
-        var removed = array[cursor];
+        if (isEmpty()) throw new IllegalStateException("Heap is empty, can't remove.");
+        var removed = array[0];
         array[0] = array[cursor];
         cursor--;
         if (!isEmpty()) bubbleDown();
@@ -75,10 +90,6 @@ public class BinaryMinHeap {
         return getFirstIndexOfLevel(level + 1) <= cursor;
     }
 
-    private int getFirstIndexOfLevel(int level) {
-        return (int)Math.pow(2, level) - 1;
-    }
-
     private void bubbleDown() {
         var index = 0;
         while(true) {
@@ -97,11 +108,7 @@ public class BinaryMinHeap {
                 : leftChild;
     }
 
-    private int getFirstChildIndex(int parent) {
-        return 2 * parent + 1;
-    }
-
-    private boolean isEmpty() {
+    public boolean isEmpty() {
         return cursor == -1;
     }
 
@@ -117,10 +124,6 @@ public class BinaryMinHeap {
         var temp = array[one];
         array[one] = array[another];
         array[another] = temp;
-    }
-
-    private int getParentIndex(int parent) {
-        return (parent - 1) / 2;
     }
 
     private void resizeWhenNeeded(int targetSize) {
