@@ -1,36 +1,37 @@
 package com.idontwantagirlfriend.Heap;
 
+import java.util.Arrays;
+
 public class MinPriorityQueue {
-    private int[] array;
-    private final int SIZE;
-    private int cursor;
+    private BinaryMinHeap heap;
 
     public MinPriorityQueue() {
-        this.SIZE = 10;
-        this.array = new int[SIZE];
+        this.heap = new BinaryMinHeap();
     }
 
     public void add(int value) {
-        if (isFull()) throw new FullQueueError();
-        var heap = new BinaryMinHeap( 10);
-        for (var i : array) heap.insert(i);
-        array[++cursor] = heap.remove();
+        heap.insert(value);
     }
 
     public int remove() {
         if (isEmpty())
             throw new IllegalStateException(
-                    "Queue is empty and you were attempting to remove from it.");
-        return array[cursor--];
+                    "Queue is empty but you were attempting to remove from it.");
+        return heap.remove();
     }
+
     public Boolean isEmpty() {
-        return cursor == -1;
+        return heap.size() == 0;
     }
 
-
-    private boolean isFull() {
-        return (cursor >= SIZE - 1);
+    @Override
+    public String toString() {
+        var tempArray = new int[heap.size()];
+        for (var i = heap.size() - 1; i >= 0; i--) {
+            tempArray[i] = heap.remove();
+        }
+        var string = Arrays.toString(tempArray);
+        for (var i : tempArray) heap.insert(i);
+        return string;
     }
-
-    private static class FullQueueError extends RuntimeException {}
 }
