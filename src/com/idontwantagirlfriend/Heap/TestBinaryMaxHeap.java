@@ -15,9 +15,21 @@ public class TestBinaryMaxHeap {
     }
 
     @Test
+    public void emptyHeapIsEmpty_ShouldReturnTrue() {
+        assertTrue(heap.isEmpty());
+    }
+
+    @Test
+    public void nonEmptyHeapIsEmpty_ShouldReturnFalse() {
+        heap.insert(10);
+        assertFalse(heap.isEmpty());
+    }
+
+    @Test
     public void toString_EmptyHeap() {
         assertEquals("[]", heap.toString());
     }
+
 
     @Test
     public void insertOneAndToString() {

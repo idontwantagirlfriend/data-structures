@@ -16,6 +16,17 @@ public class TestBinaryMinHeap {
     }
 
     @Test
+    public void emptyHeapIsEmpty_ShouldReturnTrue() {
+        assertTrue(heap.isEmpty());
+    }
+
+    @Test
+    public void nonEmptyHeapIsEmpty_ShouldReturnFalse() {
+        heap.insert(10);
+        assertFalse(heap.isEmpty());
+    }
+
+    @Test
     public void toString_EmptyHeap() {
         assertEquals("[]", heap.toString());
     }
@@ -38,6 +49,19 @@ public class TestBinaryMinHeap {
                 .forEach(heap::insert);
         assertEquals("[[1], [3, 5], [9, 7, 8, 6]]", heap.toString());
         assertEquals(7, heap.size());
+    }
+
+    @Test
+    public void insertMany() {
+        List.of(1,9,5,3,5,7,5).forEach(heap::insert);
+        assertEquals(1, heap.remove());
+        assertEquals(3, heap.remove());
+        assertEquals(5, heap.remove());
+        assertEquals(5, heap.remove());
+        assertEquals(5, heap.remove());
+        assertEquals(7, heap.remove());
+        assertEquals(9, heap.remove());
+        assertTrue(heap.isEmpty());
     }
 
     @Test
@@ -77,5 +101,44 @@ public class TestBinaryMinHeap {
                 .forEach(heap::insert);
         heap.insert(0);
         assertEquals("[[0], [1, 5], [3, 7, 8, 6], [9]]", heap.toString());
+    }
+
+    public static class HelperMethodTest {
+        @Test
+        public void getTheStartingIndexOfFirstLevel_ShouldReturn0() {
+            assertEquals(0, BinaryMinHeap.getFirstIndexOfLevel(0));
+        }
+
+        @Test
+        public void getTheStartingIndexOfGivenLevel() {
+            assertEquals(1023, BinaryMinHeap.getFirstIndexOfLevel(10));
+        }
+
+        @Test
+        public void getTheParentIndexOfRootIndex_ShouldReturnMinusOne() {
+            assertEquals(-1, BinaryMinHeap.getParentIndex(0));
+        }
+
+        @Test
+        public void getTheParentIndexOfGivenChildIndex() {
+            assertEquals(512, BinaryMinHeap.getParentIndex(1025));
+        }
+
+        @Test
+        public void getTheFirstChildIndexOfRoot_ShouldReturn1() {
+            assertEquals(1, BinaryMinHeap.getFirstChildIndex(0));
+        }
+
+        @Test
+        public void getTheFirstChildIndexOfGivenParentIndex() {
+            assertEquals(1025, BinaryMinHeap.getFirstChildIndex(512));
+        }
+
+        @Test
+        public void minusValueIntoHelperMethods_ShouldAllReturnMinusOne() {
+            assertEquals(-1, BinaryMinHeap.getFirstIndexOfLevel(-1));
+            assertEquals(-1, BinaryMinHeap.getParentIndex(-1));
+            assertEquals(-1, BinaryMinHeap.getFirstChildIndex(-1));
+        }
     }
 }
