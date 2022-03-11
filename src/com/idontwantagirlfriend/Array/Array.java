@@ -110,15 +110,15 @@ public class Array<T> extends AbstractArray<T>{
  * indexOf: Find the index of the first item
  * in the array that matches {@code searchItem}.
  * If no match is found, returns -1.<br/>
+ * If the array is empty, returns -1.<br/>
  * O(n) time complexity. Involves single traversal
  * of array.
  * @return an index (Integer).
- * @throws IllegalStateException on negative index
- * @throws IndexOutOfBoundsException on excessive index
  */
     @Override
     public int indexOf(T searchItem) {
-        for (var i = 0; i < size; i++)
+        if (bound < 0) return -1;
+        for (var i = 0; i < bound + 1; i++)
             if (array[i] == searchItem)
                 return i;
         return -1;
@@ -188,6 +188,17 @@ public class Array<T> extends AbstractArray<T>{
     @Override
     public int length() {
         return bound + 1;
+    }
+
+    /**
+     * Check if the given item exists in the array.<br/>
+     * O(n) time complexity.
+     * @param searchItem
+     * @return if the given item exists
+     */
+    @Override
+    public Boolean contains(T searchItem) {
+        return indexOf(searchItem) != -1;
     }
 
     @Override

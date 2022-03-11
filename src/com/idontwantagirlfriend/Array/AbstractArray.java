@@ -16,4 +16,6 @@ public abstract class AbstractArray<T> implements Iterable<T> {
     public abstract void join(AbstractArray<? extends T> to);
 
     public abstract int length();
+
+    public abstract Boolean contains(T searchItem);
 }

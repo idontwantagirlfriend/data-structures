@@ -107,13 +107,15 @@ public class IntArray extends AbstractIntArray {
      * indexOf: Find the index of the first item
      * in the array that matches {@code searchItem}.
      * If no match is found, returns -1.<br/>
+     * If the array is empty, returns -1.<br/>
      * O(n) time complexity. Involves single traversal
      * of array.
      * @return an index (Integer).
      */
     @Override
     public int indexOf(int searchItem) {
-        for (var i = 0; i < size; i++)
+        if (bound < 0) return -1;
+        for (var i = 0; i < bound + 1; i++)
             if (array[i] == searchItem)
                 return i;
         return -1;
@@ -166,6 +168,17 @@ public class IntArray extends AbstractIntArray {
     @Override
     public int length() {
         return bound + 1;
+    }
+
+    /**
+     * Check if the given integer exists in the array.<br/>
+     * O(n) time complexity.
+     * @param searchItem
+     * @return if the given integer exists
+     */
+    @Override
+    public Boolean contains(int searchItem) {
+        return indexOf(searchItem) != -1;
     }
 
     /**

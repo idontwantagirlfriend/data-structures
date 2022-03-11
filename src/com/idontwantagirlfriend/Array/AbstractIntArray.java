@@ -16,4 +16,6 @@ public abstract class AbstractIntArray {
     public abstract void join(AbstractIntArray to);
 
     public abstract int length();
+
+    public abstract Boolean contains(int searchItem);
 }

@@ -3,6 +3,7 @@ package com.idontwantagirlfriend.Array;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -98,6 +99,10 @@ public class TestArray {
             refreshArr();
         }
 
+        @Test
+        public void indexOfOnEmptyArray_ShouldReturnMinusOne() {
+            assertEquals(-1, arr.indexOf(0));
+        }
 
         @Test
         public void indexOfElement_ShouldReturnIndex() {
@@ -123,6 +128,32 @@ public class TestArray {
             arr.insert(5);
             arr.insert(9);
             assertEquals(-1, arr.indexOf(90));
+        }
+    }
+
+    public static class ContainsTest {
+
+        @BeforeEach
+        public void setUp() {
+            refreshArr();
+        }
+
+        @Test
+        public void containsOnEmptyArray_ShouldReturnFalse() {
+            assertFalse(arr.contains(-1));
+        }
+
+        @Test
+        public void containsNonExistentItem_ShouldReturnFalse() {
+            arr.insert(5);
+            arr.insert(9);
+            assertFalse(arr.contains(-1));
+        }
+
+        @Test
+        public void containsExistentItems_ShouldReturnTrue() {
+            List.of(1,8,6,1,3,105,19).forEach(arr::insert);
+            List.of(1,8,6,1,3,105,19).forEach(n -> assertTrue(arr.contains(n)));
         }
     }
 
