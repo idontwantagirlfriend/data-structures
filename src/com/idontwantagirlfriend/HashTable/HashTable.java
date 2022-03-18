@@ -4,15 +4,21 @@ import com.idontwantagirlfriend.Array.Array;
 import com.idontwantagirlfriend.Array.LinearGrowingArray;
 import com.idontwantagirlfriend.LinkedList.LinkedList;
 
+import java.util.function.Function;
+
 /**
  * An implementation of hash table with {@code Array} and {@code LinkedList}
  * classes. Does not support resizing. Internally using
- * chaining to avoid collision.
+ * chaining to avoid collision. <br/>
+ * Does not support primitive type as key,
+ * as generics don't support them, as this class
+ * uses object equality to match keys.
  * @param <K>
  * @param <V>
  */
 public class HashTable<K, V> extends AbstractHashTable<K, V>{
     private Array<LinkedList<Entry<K, V>>> items;
+    private Function<K, Integer> hashMethod;
     private int capacity;
 
     /**
@@ -37,7 +43,9 @@ public class HashTable<K, V> extends AbstractHashTable<K, V>{
     }
 
     private int hash(K key) {
-        return key.hashCode() % capacity;
+        return hashMethod == null
+            ? key.hashCode() % capacity
+            : hashMethod.apply(key) % capacity;
     }
 
     /**
@@ -87,7 +95,8 @@ public class HashTable<K, V> extends AbstractHashTable<K, V>{
      * can be found, will throw NullPointerException.
      * @param key the unique identifier of entry
      * @return value of the removed entry
-     * @throws NullPointerException
+     * @throws NullPointerException when the given key isn't
+     * present in the hashtable
      */
     @Override
     public V remove(K key) {
@@ -103,6 +112,10 @@ public class HashTable<K, V> extends AbstractHashTable<K, V>{
         throw new NullPointerException(
                 "The following key doesn't exist in the current hash table: "
                 + key.toString());
+    }
+
+    public void setHashMethod(Function<K, Integer> newHashMethod) {
+        this.hashMethod = newHashMethod;
     }
 
     private LinkedList<Entry<K, V>> findLocation(K key) {
