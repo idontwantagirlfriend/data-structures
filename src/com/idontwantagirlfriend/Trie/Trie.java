@@ -20,7 +20,6 @@ public class Trie {
     public Boolean find(String word) {
         if (word == null) return root.findInSubtrees(null);
         return root.findInSubtrees(word.toLowerCase());
-
     }
 
     public static class Node {
