@@ -73,6 +73,22 @@ public class ArrayTrie {
         return cursor.getIsEOW();
     }
 
+    private static void handleIllegalCharacter(char letter) {
+        var alphabeticalIndex = letter - 'a';
+        if (alphabeticalIndex < 0 || alphabeticalIndex > 26)
+            throw new IllegalArgumentException(
+                    "The word can only contains alphabetical letters.");
+    }
+
+    private void handleMeaninglessInput(String word) {
+        if (word == null)
+            throw new IllegalArgumentException(
+                    "Trie can't operate with null arguments.");
+        if (word.equals(""))
+            throw new IllegalArgumentException(
+                    "Trie can't operate with empty string.");
+    }
+
     public static class Node {
 
         public static int getLetterPosition(char letter) {
@@ -94,9 +110,6 @@ public class ArrayTrie {
             this.letter = letter;
         }
 
-        public char getLetter() {
-            return letter;
-        }
 
         public Boolean safeAdd(char letter) {
             var success = false;
@@ -110,37 +123,6 @@ public class ArrayTrie {
         public Node findChild(char letter) {
             handleIllegalCharacter(letter);
             return subtrees[getLetterPosition(letter)];
-        }
-
-        private Node setChild(int position, Node child) {
-            subtrees[position] = child;
-            return child;
-        }
-
-        public Boolean hasChild(char letter) {
-            return findChild(letter) != null;
-        }
-
-        public Boolean hasNoChild() {
-            for (var i = 0; i < ALPHABET_NUMBER; i++) {
-                if (subtrees[i] != null) return false;
-            }
-            return true;
-        }
-
-        public Node removeChild(char letter) {
-            if (hasChild(letter)) {
-                var removed = findChild(letter);
-                setChild(getLetterPosition(letter), null);
-                return removed;
-            }
-            return null;
-        }
-
-        public Node addChild(char letter) {
-            handleIllegalCharacter(letter);
-            var newChild = new Node(letter);
-            return setChild(getLetterPosition(letter), newChild);
         }
 
         public Boolean pruneChild(char letter) {
@@ -159,27 +141,46 @@ public class ArrayTrie {
             return this.isEOW;
         }
 
+        public Boolean hasChild(char letter) {
+            return findChild(letter) != null;
+        }
+
+        public char getLetter() {
+            return letter;
+        }
+
+        private Node setChild(char letter, Node child) {
+            subtrees[getLetterPosition(letter)] = child;
+            return child;
+        }
+
+        public Boolean hasNoChild() {
+            for (var i = 0; i < ALPHABET_NUMBER; i++) {
+                if (subtrees[i] != null) return false;
+            }
+            return true;
+        }
+
+        public Node removeChild(char letter) {
+            if (hasChild(letter)) {
+                var removed = findChild(letter);
+                setChild(letter, null);
+                return removed;
+            }
+            return null;
+        }
+
+        public Node addChild(char letter) {
+            handleIllegalCharacter(letter);
+            var newChild = new Node(letter);
+            return setChild(letter, newChild);
+        }
+
         private void handleIllegalCharacter(char letter) {
             var position = getLetterPosition(letter);
             if (position < 0 || position > 26)
                 throw new IllegalArgumentException(
                         "Only accept lowercase alphabetical letter.");
         }
-    }
-
-    private static void handleIllegalCharacter(char letter) {
-        var alphabeticalIndex = letter - 'a';
-        if (alphabeticalIndex < 0 || alphabeticalIndex > 26)
-            throw new IllegalArgumentException(
-                    "The word can only contains alphabetical letters.");
-    }
-
-    private void handleMeaninglessInput(String word) {
-        if (word == null)
-            throw new IllegalArgumentException(
-                    "Trie can't operate with null arguments.");
-        if (word.equals(""))
-            throw new IllegalArgumentException(
-                    "Trie can't operate with empty string.");
     }
 }
