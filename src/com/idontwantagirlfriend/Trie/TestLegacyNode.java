@@ -7,12 +7,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestNode {
-    private Trie.Node node;
+public class TestLegacyNode {
+    private LegacyTrie.Node node;
 
     @BeforeEach
     public void setUp() {
-        node = new Trie.Node(null);
+        node = new LegacyTrie.Node(null);
     }
 
     @Test

@@ -7,12 +7,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestTrie {
-    private Trie trie;
+public class TestLegacyTrie {
+    private LegacyTrie trie;
 
     @BeforeEach
     public void setUp() {
-        trie = new Trie();
+        trie = new LegacyTrie();
     }
 
     @ParameterizedTest

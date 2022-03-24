@@ -4,10 +4,10 @@ package com.idontwantagirlfriend.Trie;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class Trie {
+public class LegacyTrie {
     private Node root;
 
-    public Trie() {
+    public LegacyTrie() {
         this.root = new Node(null);
     }
 
