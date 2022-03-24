@@ -19,7 +19,7 @@ public class ArrayTrie {
         for (var i = 0; i < lowercase.length(); i++) {
             var letter = lowercase.charAt(i);
             handleIllegalCharacter(letter);
-            cursor.add(letter);
+            cursor.safeAdd(letter);
             cursor = cursor.findChild(letter);
         }
         cursor.setIsEOW(true);
@@ -98,7 +98,7 @@ public class ArrayTrie {
             return letter;
         }
 
-        public Boolean add(char letter) {
+        public Boolean safeAdd(char letter) {
             var success = false;
             if (!hasChild(letter)) {
                 addChild(letter);

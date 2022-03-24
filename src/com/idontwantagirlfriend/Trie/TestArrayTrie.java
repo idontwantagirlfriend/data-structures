@@ -263,17 +263,17 @@ public class TestArrayTrie {
         }
 
         @Test
-        public void addOneUniqueLetter_ShouldReturnTrue() {
+        public void safeAddOneUniqueLetter_ShouldReturnTrue() {
             assertNull(node.findChild('a'));
-            assertTrue(node.add('a'));
+            assertTrue(node.safeAdd('a'));
             assertEquals('a', node.findChild('a').getLetter());
         }
 
         @Test
-        public void addOneDuplicateLetter_ShouldReturnFalseAndKeepTheOriginalChild() {
+        public void safeAddOneDuplicateLetter_ShouldReturnFalseAndKeepTheOriginalChild() {
             var oldChild = node.addChild('k');
             assertEquals('k', oldChild.getLetter());
-            assertFalse(node.add('k'));
+            assertFalse(node.safeAdd('k'));
             assertSame(oldChild, node.findChild('k'));
         }
     }
