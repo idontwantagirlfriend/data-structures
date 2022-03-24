@@ -3,15 +3,13 @@ package com.idontwantagirlfriend.Trie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestArrayTrie {
     public ArrayTrie trie;
 
     public void refreshTrie() {
-        trie = new ArrayTrie();
+        trie = new ArrayTrie(new ArrayNode());
     }
 
     @BeforeEach
@@ -117,164 +115,86 @@ public class TestArrayTrie {
         assertThrows(IllegalArgumentException.class, () -> trie.find(null));
     }
 
-    public static class NodeTest {
-        private ArrayTrie.Node node;
+    public static class NodeMgrTest {
+        private final ArrayTrie.NodeMgr nodeMgr = new ArrayTrie.NodeMgr();
+        private Node node;
 
         @BeforeEach
         public void setUpEach() {
-            node = new ArrayTrie.Node('a');
-        }
-
-        @Test
-        public void getPositionOfLetters_ShouldFallBetween0And26() {
-            assertEquals(0, ArrayTrie.Node.getLetterPosition('a'));
-            assertEquals(25, ArrayTrie.Node.getLetterPosition('z'));
-        }
-
-        @Test
-        public void getLetterOfNode() {
-            assertEquals('a', node.getLetter());
+            node = new ArrayNode('a');
         }
 
         @Test
         public void findChildOfEmptyNode_ShouldReturnNull() {
-            assertNull(node.findChild('a'));
+            assertNull(nodeMgr.findChild(node, 'a'));
         }
 
         @Test
         public void findNonAlphabeticalChild_ShouldThrowIllegalArgumentException() {
-            assertThrows(IllegalArgumentException.class, () -> node.findChild('='));
-            assertThrows(IllegalArgumentException.class, () -> node.findChild(' '));
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> nodeMgr.findChild(node, '='));
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> nodeMgr.findChild(node, ' '));
         }
 
         @Test
         public void findUppercaseLetterChild_ShouldThrowIllegalArgumentException() {
-            assertThrows(IllegalArgumentException.class, () -> node.findChild('A'));
-        }
-
-        @Test
-        public void emptyNodeHasChild_ShouldReturnFalse() {
-            assertFalse(node.hasChild('b'));
-        }
-
-        @Test
-        public void hasNonExistentChild_ShouldReturnFalse() {
-            assertFalse(node.hasChild('b'));
-        }
-
-        @Test
-        public void hasIllegalCharacterChild_ShouldThrowIllegalArgumentException() {
-            assertThrows(IllegalArgumentException.class, () -> node.hasChild(' '));
-        }
-
-        @Test
-        public void addOneChild() {
-            node.addChild('f');
-        }
-
-        @Test
-        public void addManyChildren() {
-            List.of('a','m','s').forEach(node::addChild);
-        }
-
-        @Test
-        public void addIllegalCharacterChild_ShouldThrowIllegalArgumentException() {
-            assertThrows(IllegalArgumentException.class, () -> node.addChild(' '));
-            assertThrows(IllegalArgumentException.class, () -> node.addChild('A'));
-        }
-
-        @Test
-        public void addOneHasOne_ShouldReturnTrue() {
-            node.addChild('m');
-            assertTrue(node.hasChild('m'));
-        }
-
-        @Test
-        public void addOneFindOne_ShouldReturnChild() {
-            node.addChild('m');
-            assertInstanceOf(ArrayTrie.Node.class, node.findChild('m'));
-            assertEquals('m', node.findChild('m').getLetter());
-        }
-
-        @Test
-        public void addRepetitiveCharAndFind_ShouldReturnDifferentChildObjectEachTime() {
-            node.addChild('k');
-            var oldChild = node.findChild('k');
-            node.addChild('k');
-            var newChild = node.findChild('k');
-            assertEquals(oldChild.getLetter(), newChild.getLetter());
-            assertNotSame(oldChild, newChild);
-        }
-
-        @Test
-        public void emptyNodeHasNoChild_ShouldReturnTrue() {
-            assertTrue(node.hasNoChild());
-        }
-
-        @Test
-        public void addOneAndHasNoChild_ShouldReturnFalse() {
-            node.addChild('k');
-            assertFalse(node.hasNoChild());
-        }
-
-        @Test
-        public void removeANonExistentChild_ShouldReturnNull() {
-            assertNull(node.removeChild('k'));
-            node.addChild('k');
-            assertNull(node.removeChild('f'));
-        }
-
-        @Test
-        public void removeAChild_ShouldReturnTheChild() {
-            node.addChild('k');
-            var removed = node.findChild('k');
-            assertSame(removed, node.removeChild('k'));
-        }
-
-        @Test
-        public void pruneChildThatHasNoChild_ShouldReturnTrue() {
-            node.addChild('k');
-            assertTrue(node.pruneChild('k'));
-            assertNull(node.findChild('k'));
-        }
-
-        @Test
-        public void pruneChildThatHasChildren_ShouldReturnFalse() {
-            var kNode = node.addChild('k');
-            kNode.addChild('t');
-            assertFalse(node.pruneChild('k'));
-            assertSame(kNode, node.findChild('k'));
-        }
-
-        @Test
-        public void pruneNonExistentChild_ShouldReturnFalse() {
-            assertFalse(node.pruneChild('a'));
-        }
-
-        @Test
-        public void getDefaultEOWStatus_ShouldReturnFalse() {
-            assertFalse(node.getIsEOW());
-        }
-
-        @Test
-        public void explicitlySetIsEOWAndGetEOWStatus_ShouldReturnTrue() {
-            node.setIsEOW(true);
-            assertTrue(node.getIsEOW());
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> nodeMgr.findChild(node, 'A'));
         }
 
         @Test
         public void safeAddOneUniqueLetter_ShouldReturnTrue() {
-            assertNull(node.findChild('a'));
-            assertTrue(node.safeAdd('a'));
-            assertEquals('a', node.findChild('a').getLetter());
+            assertNull(nodeMgr.findChild(node, 'a'));
+            assertTrue(nodeMgr.safeAdd(node, 'a'));
+            assertInstanceOf(Node.class, nodeMgr.findChild(node, 'a'));
         }
 
         @Test
         public void safeAddOneDuplicateLetter_ShouldReturnFalseAndKeepTheOriginalChild() {
-            var oldChild = node.addChild('k');
-            assertEquals('k', oldChild.getLetter());
-            assertFalse(node.safeAdd('k'));
-            assertSame(oldChild, node.findChild('k'));
+            var firstAddSuccess = nodeMgr.safeAdd(node, 'k');
+            assertTrue(firstAddSuccess);
+            var oldChild = nodeMgr.findChild(node, 'k');
+            assertInstanceOf(Node.class, oldChild);
+            assertFalse(nodeMgr.safeAdd(node, 'k'));
+            assertSame(oldChild, nodeMgr.findChild(node, 'k'));
+        }
+
+        @Test
+        public void safeAddOneFindOne_ShouldReturnChild() {
+            nodeMgr.safeAdd(node, 'm');
+            assertInstanceOf(Node.class, nodeMgr.findChild(node, 'm'));
+        }
+
+        @Test
+        public void safeAddNonAlphabeticalLowercaseChar_ShouldThrowIllegalArgumentException() {
+            assertThrows(IllegalArgumentException.class, () -> nodeMgr.safeAdd(node, '?'));
+            assertThrows(IllegalArgumentException.class, () -> nodeMgr.safeAdd(node, 'A'));
+        }
+
+        @Test
+        public void pruneChildThatHasNoChild_ShouldReturnTrue() {
+            nodeMgr.safeAdd(node, 'k');
+            assertInstanceOf(Node.class, nodeMgr.findChild(node, 'k'));
+            assertTrue(nodeMgr.pruneChild(node, 'k'));
+            assertNull(nodeMgr.findChild(node, 'k'));
+        }
+
+        @Test
+        public void pruneChildThatHasChildren_ShouldReturnFalse() {
+            nodeMgr.safeAdd(node, 'k');
+            var kNode = nodeMgr.findChild(node, 'k');
+            nodeMgr.safeAdd(kNode, 't');
+            assertFalse(nodeMgr.pruneChild(node, 'k'));
+            assertSame(kNode, nodeMgr.findChild(node, 'k'));
+        }
+
+        @Test
+        public void pruneNonExistentChild_ShouldReturnFalse() {
+            assertFalse(nodeMgr.pruneChild(node, 'a'));
         }
     }
 }

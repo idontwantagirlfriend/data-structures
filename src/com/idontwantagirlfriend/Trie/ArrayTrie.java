@@ -1,10 +1,12 @@
 package com.idontwantagirlfriend.Trie;
 
 public class ArrayTrie {
+    private NodeMgr nodeMgr;
     private Node root;
 
-    public ArrayTrie() {
-        this.root = new Node();
+    public ArrayTrie(Node root) {
+        this.nodeMgr = new NodeMgr();
+        this.root = root;
     }
 
     /**
@@ -19,10 +21,10 @@ public class ArrayTrie {
         for (var i = 0; i < lowercase.length(); i++) {
             var letter = lowercase.charAt(i);
             handleIllegalCharacter(letter);
-            cursor.safeAdd(letter);
-            cursor = cursor.findChild(letter);
+            nodeMgr.safeAdd(cursor, letter);
+            cursor = nodeMgr.findChild(cursor, letter);
         }
-        cursor.setIsEOW(true);
+        nodeMgr.setIsEOW(cursor, true);
     }
 
     /**
@@ -39,17 +41,17 @@ public class ArrayTrie {
         for (var i = 0; i < lowercase.length() - 1; i++) {
             var letter = lowercase.charAt(i);
             if (!cursor.hasChild(letter)) return null;
-            cursor = cursor.findChild(letter);
+            cursor = nodeMgr.findChild(cursor, letter);
         }
 
 //        word.length() > 1 has been ensured.
         var lastLetter = lowercase.charAt(word.length() - 1);
         if (!cursor.hasChild(lastLetter)
-                || !cursor.findChild(lastLetter).getIsEOW())
+                || !nodeMgr.getIsEOW(nodeMgr.findChild(cursor, lastLetter)))
             return null;
-        if (!cursor.pruneChild(lastLetter))
-            cursor.findChild(lastLetter).setIsEOW(false);
-        cursor.setIsEOW(false);
+        if (!nodeMgr.pruneChild(cursor, lastLetter))
+            nodeMgr.setIsEOW(nodeMgr.findChild(cursor, lastLetter), false);
+        nodeMgr.setIsEOW(cursor, false);
         return word;
     }
 
@@ -68,9 +70,9 @@ public class ArrayTrie {
             var letter = lowercase.charAt(i);
             handleIllegalCharacter(letter);
             if (!cursor.hasChild(letter)) return false;
-            cursor = cursor.findChild(letter);
+            cursor = nodeMgr.findChild(cursor, letter);
         }
-        return cursor.getIsEOW();
+        return nodeMgr.getIsEOW(cursor);
     }
 
     private static void handleIllegalCharacter(char letter) {
@@ -89,98 +91,34 @@ public class ArrayTrie {
                     "Trie can't operate with empty string.");
     }
 
-    public static class Node {
-
-        public static int getLetterPosition(char letter) {
-            return letter - 'a';
-        }
-
-        private final Node[] subtrees;
-        private final int ALPHABET_NUMBER = 26;
-        private char letter;
-        private Boolean isEOW;
-
-        public Node() {
-            subtrees = new Node[ALPHABET_NUMBER];
-            isEOW = false;
-        }
-
-        public Node(char letter) {
-            this();
-            this.letter = letter;
-        }
-
-
-        public Boolean safeAdd(char letter) {
+    public static class NodeMgr {
+        public Boolean safeAdd(Node node, char letter) {
             var success = false;
-            if (!hasChild(letter)) {
-                addChild(letter);
+            if (!node.hasChild(letter)) {
+                node.addChild(letter);
                 success = true;
             }
             return success;
         }
 
-        public Node findChild(char letter) {
-            handleIllegalCharacter(letter);
-            return subtrees[getLetterPosition(letter)];
+        public Node findChild(Node node, char letter) {
+            return node.getChild(letter);
         }
 
-        public Boolean pruneChild(char letter) {
-            if (hasChild(letter) && findChild(letter).hasNoChild()) {
-                removeChild(letter);
+        public Boolean pruneChild(Node node, char letter) {
+            if (node.hasChild(letter) && node.getChild(letter).hasNoChild()) {
+                node.removeChild(letter);
                 return true;
             }
             return false;
         }
 
-        public void setIsEOW(Boolean isEOW) {
-            this.isEOW = isEOW;
+        public void setIsEOW(Node node, Boolean isEOW) {
+            node.setEOW(isEOW);
         }
 
-        public Boolean getIsEOW() {
-            return this.isEOW;
-        }
-
-        public Boolean hasChild(char letter) {
-            return findChild(letter) != null;
-        }
-
-        public char getLetter() {
-            return letter;
-        }
-
-        private Node setChild(char letter, Node child) {
-            subtrees[getLetterPosition(letter)] = child;
-            return child;
-        }
-
-        public Boolean hasNoChild() {
-            for (var i = 0; i < ALPHABET_NUMBER; i++) {
-                if (subtrees[i] != null) return false;
-            }
-            return true;
-        }
-
-        public Node removeChild(char letter) {
-            if (hasChild(letter)) {
-                var removed = findChild(letter);
-                setChild(letter, null);
-                return removed;
-            }
-            return null;
-        }
-
-        public Node addChild(char letter) {
-            handleIllegalCharacter(letter);
-            var newChild = new Node(letter);
-            return setChild(letter, newChild);
-        }
-
-        private void handleIllegalCharacter(char letter) {
-            var position = getLetterPosition(letter);
-            if (position < 0 || position > 26)
-                throw new IllegalArgumentException(
-                        "Only accept lowercase alphabetical letter.");
+        public Boolean getIsEOW(Node node) {
+            return node.getEOW();
         }
     }
 }
