@@ -1,10 +1,10 @@
 package com.idontwantagirlfriend.Trie;
 
-public class ArrayTrie {
+public class Trie {
     private NodeMgr nodeMgr;
     private Node root;
 
-    public ArrayTrie(Node root) {
+    public Trie(Node root) {
         this.nodeMgr = new NodeMgr();
         this.root = root;
     }

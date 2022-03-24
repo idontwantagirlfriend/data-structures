@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestArrayTrie {
-    public ArrayTrie trie;
+public class TestTrie {
+    public Trie trie;
 
     public void refreshTrie() {
-        trie = new ArrayTrie(new ArrayNode());
+        trie = new Trie(new ArrayNode());
     }
 
     @BeforeEach
@@ -116,7 +116,7 @@ public class TestArrayTrie {
     }
 
     public static class NodeMgrTest {
-        private final ArrayTrie.NodeMgr nodeMgr = new ArrayTrie.NodeMgr();
+        private final Trie.NodeMgr nodeMgr = new Trie.NodeMgr();
         private Node node;
 
         @BeforeEach

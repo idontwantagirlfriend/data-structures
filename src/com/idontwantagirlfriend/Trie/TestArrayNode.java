@@ -8,11 +8,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestArrayNode {
-    private ArrayNode arrayNode;
+    private Node node;
 
     @BeforeEach
     public void setUpEach() {
-        arrayNode = new ArrayNode('a');
+        node = new ArrayNode('a');
     }
 
     @Test
@@ -23,90 +23,90 @@ public class TestArrayNode {
 
     @Test
     public void getLetterOfNode() {
-        assertEquals('a', arrayNode.getLetter());
+        assertEquals('a', node.getLetter());
     }
 
     @Test
     public void emptyNodeHasChild_ShouldReturnFalse() {
-        assertFalse(arrayNode.hasChild('b'));
+        assertFalse(node.hasChild('b'));
     }
 
     @Test
     public void hasNonExistentChild_ShouldReturnFalse() {
-        assertFalse(arrayNode.hasChild('b'));
+        assertFalse(node.hasChild('b'));
     }
 
     @Test
     public void hasIllegalCharacterChild_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> arrayNode.hasChild(' '));
+        assertThrows(IllegalArgumentException.class, () -> node.hasChild(' '));
     }
 
     @Test
     public void addOneChild() {
-        arrayNode.addChild('f');
+        node.addChild('f');
     }
 
     @Test
     public void addManyChildren() {
-        List.of('a','m','s').forEach(arrayNode::addChild);
+        List.of('a','m','s').forEach(node::addChild);
     }
 
     @Test
     public void addIllegalCharacterChild_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> arrayNode.addChild(' '));
-        assertThrows(IllegalArgumentException.class, () -> arrayNode.addChild('A'));
+        assertThrows(IllegalArgumentException.class, () -> node.addChild(' '));
+        assertThrows(IllegalArgumentException.class, () -> node.addChild('A'));
     }
 
     @Test
     public void addOneHasOne_ShouldReturnTrue() {
-        arrayNode.addChild('m');
-        assertTrue(arrayNode.hasChild('m'));
+        node.addChild('m');
+        assertTrue(node.hasChild('m'));
     }
 
     @Test
     public void addRepetitiveCharAndFind_ShouldReturnDifferentChildObjectEachTime() {
-        arrayNode.addChild('k');
-        var oldChild = arrayNode.getChild('k');
-        arrayNode.addChild('k');
-        var newChild = arrayNode.getChild('k');
+        node.addChild('k');
+        var oldChild = node.getChild('k');
+        node.addChild('k');
+        var newChild = node.getChild('k');
         assertEquals(oldChild.getLetter(), newChild.getLetter());
         assertNotSame(oldChild, newChild);
     }
 
     @Test
     public void emptyNodeHasNoChild_ShouldReturnTrue() {
-        assertTrue(arrayNode.hasNoChild());
+        assertTrue(node.hasNoChild());
     }
 
     @Test
     public void addOneAndHasNoChild_ShouldReturnFalse() {
-        arrayNode.addChild('k');
-        assertFalse(arrayNode.hasNoChild());
+        node.addChild('k');
+        assertFalse(node.hasNoChild());
     }
 
     @Test
     public void removeANonExistentChild_ShouldReturnNull() {
-        assertNull(arrayNode.removeChild('k'));
-        arrayNode.addChild('k');
-        assertNull(arrayNode.removeChild('f'));
+        assertNull(node.removeChild('k'));
+        node.addChild('k');
+        assertNull(node.removeChild('f'));
     }
 
     @Test
     public void removeAChild_ShouldReturnTheChild() {
-        arrayNode.addChild('k');
-        var removed = arrayNode.getChild('k');
-        assertSame(removed, arrayNode.removeChild('k'));
+        node.addChild('k');
+        var removed = node.getChild('k');
+        assertSame(removed, node.removeChild('k'));
     }
 
     @Test
     public void getDefaultEOWStatus_ShouldReturnFalse() {
-        assertFalse(arrayNode.getEOW());
+        assertFalse(node.getEOW());
     }
 
     @Test
     public void explicitlySetEOWAndGetEOWStatus_ShouldReturnTrue() {
-        arrayNode.setEOW(true);
-        assertTrue(arrayNode.getEOW());
+        node.setEOW(true);
+        assertTrue(node.getEOW());
     }
 
 }
