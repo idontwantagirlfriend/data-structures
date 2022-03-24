@@ -3,17 +3,15 @@ package com.idontwantagirlfriend.Trie;
 public interface Node {
     char getLetter();
 
-    ArrayNode getChild(char letter);
-
-    ArrayNode setChild(char letter, ArrayNode child);
+    Node getChild(char letter);
 
     Boolean hasChild(char letter);
 
     Boolean hasNoChild();
 
-    ArrayNode removeChild(char letter);
+    Node removeChild(char letter);
 
-    ArrayNode addChild(char letter);
+    Node addChild(char letter);
 
     void setEOW(Boolean isEOW);
 
