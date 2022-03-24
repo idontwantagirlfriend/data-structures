@@ -18,7 +18,7 @@ public class ArrayNode implements Node {
     }
 
 
-    public static int getLetterPosition(char letter) {
+    private static int getLetterPosition(char letter) {
         return letter - 'a';
     }
 
@@ -33,8 +33,7 @@ public class ArrayNode implements Node {
         return subtrees[getLetterPosition(letter)];
     }
 
-    @Override
-    public ArrayNode setChild(char letter, ArrayNode child) {
+    private ArrayNode setChild(char letter, ArrayNode child) {
         handleIllegalCharacter(letter);
         subtrees[getLetterPosition(letter)] = child;
         return child;
@@ -83,6 +82,6 @@ public class ArrayNode implements Node {
         var position = getLetterPosition(letter);
         if (position < 0 || position > 26)
             throw new IllegalArgumentException(
-                    "Only accept lowercase alphabetical letter.");
+                    "A node is only supposed to store lowercase alphabetical letter.");
     }
 }

@@ -16,12 +16,6 @@ public class TestArrayNode {
     }
 
     @Test
-    public void getPositionOfLetters_ShouldFallBetween0And26() {
-        assertEquals(0, ArrayNode.getLetterPosition('a'));
-        assertEquals(25, ArrayNode.getLetterPosition('z'));
-    }
-
-    @Test
     public void getLetterOfNode() {
         assertEquals('a', node.getLetter());
     }
@@ -39,6 +33,17 @@ public class TestArrayNode {
     @Test
     public void hasIllegalCharacterChild_ShouldThrowIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> node.hasChild(' '));
+    }
+
+    @Test
+    public void getNonExistentChild_ShouldReturnNull() {
+        assertNull(node.getChild('w'));
+    }
+
+    @Test
+    public void getIllegalCharacter_ShouldThrowIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> node.getChild('A'));
+        assertThrows(IllegalArgumentException.class, () -> node.getChild('?'));
     }
 
     @Test
@@ -64,7 +69,7 @@ public class TestArrayNode {
     }
 
     @Test
-    public void addRepetitiveCharAndFind_ShouldReturnDifferentChildObjectEachTime() {
+    public void addRepetitiveCharAndGet_ShouldReturnDifferentChildObjectEachTime() {
         node.addChild('k');
         var oldChild = node.getChild('k');
         node.addChild('k');
@@ -108,5 +113,4 @@ public class TestArrayNode {
         node.setEOW(true);
         assertTrue(node.getEOW());
     }
-
 }
