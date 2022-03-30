@@ -7,11 +7,13 @@ public interface Node {
 
     Boolean hasChild(char letter);
 
-    Boolean hasNoChild();
-
     Node removeChild(char letter);
 
     Node addChild(char letter);
+
+    Node[] getAllChildren();
+
+    Boolean hasNoChild();
 
     void setEOW(Boolean isEOW);
 

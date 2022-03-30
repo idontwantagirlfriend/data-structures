@@ -1,16 +1,18 @@
 package com.idontwantagirlfriend.Trie;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HashMapNode implements Node {
 
-    private HashMap<Character, HashMapNode> map;
+    private HashMap<Character, HashMapNode> subtrees;
     private Boolean isEOW;
     private char letter;
 
     public HashMapNode() {
         isEOW = false;
-        map = new HashMap<>();
+        subtrees = new HashMap<>();
     }
 
     public HashMapNode(char letter) {
@@ -26,31 +28,49 @@ public class HashMapNode implements Node {
     @Override
     public HashMapNode getChild(char letter) {
         handleIllegalCharacter(letter);
-        return map.get(letter);
+        return subtrees.get(letter);
     }
 
     @Override
     public Boolean hasChild(char letter) {
         handleIllegalCharacter(letter);
-        return map.containsKey(letter);
+        return subtrees.containsKey(letter);
     }
 
     @Override
     public Boolean hasNoChild() {
-        return map.isEmpty();
+        return subtrees.isEmpty();
     }
 
     @Override
     public HashMapNode removeChild(char letter) {
-        return map.remove(letter);
+        return subtrees.remove(letter);
     }
 
     @Override
     public HashMapNode addChild(char letter) {
         handleIllegalCharacter(letter);
         var child = new HashMapNode(letter);
-        map.put(letter, child);
+        subtrees.put(letter, child);
         return child;
+    }
+
+    @Override
+    public HashMapNode[] getAllChildren() {
+        var allChildren = new HashMapNode[5];
+        var cursor = -1;
+
+        for (var entry : subtrees.entrySet()) {
+            if (cursor >= allChildren.length - 1) {
+                var expanded = new HashMapNode[allChildren.length * 2];
+                for (var i = 0; i < allChildren.length; i++)
+                    expanded[i] = allChildren[i];
+                allChildren = expanded;
+            }
+            allChildren[++cursor] = entry.getValue();
+        }
+
+        return allChildren;
     }
 
     @Override

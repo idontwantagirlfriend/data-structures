@@ -1,5 +1,12 @@
 package com.idontwantagirlfriend.Trie;
 
+import com.idontwantagirlfriend.Array.Array;
+
+/** Deprecation warning:
+ * This implementation does not take into account
+ * non-alphabetical letters. It may be incompatible
+ * with later implementations of Trie.
+ */
 public class ArrayNode implements Node {
     private final ArrayNode[] subtrees;
     private final int ALPHABET_NUMBER = 26;
@@ -66,6 +73,19 @@ public class ArrayNode implements Node {
     public ArrayNode addChild(char letter) {
         var newChild = new ArrayNode(letter);
         return setChild(letter, newChild);
+    }
+
+    @Override
+    public ArrayNode[] getAllChildren() {
+        var allChildren = new ArrayNode[26];
+        var cursor = -1;
+
+        for (var i = 0; i < subtrees.length; i++) {
+            if (subtrees[i] != null)
+                allChildren[++cursor] = subtrees[i];
+        }
+
+        return allChildren;
     }
 
     @Override
