@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestTrie {
-    public Trie trie;
+public class TestLinkTrie {
+    public LinkTrie linkTrie;
 
     public void refreshTrie() {
-        trie = new Trie(new ArrayNode());
+        linkTrie = new LinkTrie(new ArrayNode());
     }
 
     @BeforeEach
@@ -19,104 +19,104 @@ public class TestTrie {
 
     @Test
     public void addAWord() {
-        trie.add("Hello");
+        linkTrie.add("Hello");
     }
 
     @Test
     public void addASpaceCharacter_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> trie.add(" "));
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.add(" "));
     }
 
     @Test
     public void addEmptyString_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> trie.add(""));
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.add(""));
     }
 
     @Test
     public void addAWordThatContainsNonAlphabeticalChars_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> trie.add("Hello "));
-        assertThrows(IllegalArgumentException.class, () -> trie.add("Étranger"));
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.add("Hello "));
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.add("Étranger"));
     }
 
     @Test
     public void removeAWord_ShouldReturnTheRemovedWord() {
-        trie.add("Hello");
-        trie.add("world");
-        trie.add("This");
-        assertEquals("World", trie.remove("World"));
+        linkTrie.add("Hello");
+        linkTrie.add("world");
+        linkTrie.add("This");
+        assertEquals("World", linkTrie.remove("World"));
     }
 
     @Test
     public void removeAWordThatDoesNotExist_ShouldReturnNull() {
-        trie.add("Hello");
-        assertNull(trie.remove("Hell"));
-        assertNull(trie.remove("A"));
-        assertNull(trie.remove("Helmet"));
+        linkTrie.add("Hello");
+        assertNull(linkTrie.remove("Hell"));
+        assertNull(linkTrie.remove("A"));
+        assertNull(linkTrie.remove("Helmet"));
     }
 
     @Test
     public void removeANonExistentWordThatIsPartOfSomeWordInTheTrie_ShouldReturnNull() {
-        trie.add("fellow");
-        assertNull(trie.remove("fell"));
+        linkTrie.add("fellow");
+        assertNull(linkTrie.remove("fell"));
     }
 
     @Test
     public void removeAWordThatIsPartOfSomeWordInTheTrie_ShouldReturnTheRemovedWord() {
-        trie.add("fellow");
-        trie.add("fell");
-        assertEquals("fell", trie.remove("fell"));
+        linkTrie.add("fellow");
+        linkTrie.add("fell");
+        assertEquals("fell", linkTrie.remove("fell"));
     }
 
     @Test
     public void removeNull_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> trie.remove(null));
-        trie.add("No");
-        assertThrows(IllegalArgumentException.class, () -> trie.remove(null));
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.remove(null));
+        linkTrie.add("No");
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.remove(null));
     }
 
     @Test
     public void removeEmptyString_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> trie.remove(""));
-        trie.add("Aufschlag");
-        assertThrows(IllegalArgumentException.class, () -> trie.remove(""));
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.remove(""));
+        linkTrie.add("Aufschlag");
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.remove(""));
     }
 
     @Test
     public void findAWord_ShouldReturnTrue() {
-        trie.add("ww");
-        assertTrue(trie.find("ww"));
+        linkTrie.add("ww");
+        assertTrue(linkTrie.find("ww"));
     }
 
     @Test
     public void findANonExistentWord_ShouldReturnFalse() {
-        assertFalse(trie.find("firelight"));
-        trie.add("sunken");
-        assertFalse(trie.find("firelight"));
+        assertFalse(linkTrie.find("firelight"));
+        linkTrie.add("sunken");
+        assertFalse(linkTrie.find("firelight"));
     }
 
     @Test
     public void findASimilarWord_ShouldReturnFalse() {
-        trie.add("forward");
-        assertFalse(trie.find("for"));
-        assertFalse(trie.find("forwarding"));
+        linkTrie.add("forward");
+        assertFalse(linkTrie.find("for"));
+        assertFalse(linkTrie.find("forwarding"));
     }
 
     @Test
     public void findEmptyString_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> trie.find(""));
-        trie.add("Abs");
-        assertThrows(IllegalArgumentException.class, () -> trie.find(""));
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.find(""));
+        linkTrie.add("Abs");
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.find(""));
     }
 
     @Test
     public void findNull_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> trie.find(null));
-        trie.add("Abs");
-        assertThrows(IllegalArgumentException.class, () -> trie.find(null));
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.find(null));
+        linkTrie.add("Abs");
+        assertThrows(IllegalArgumentException.class, () -> linkTrie.find(null));
     }
 
     public static class NodeMgrTest {
-        private final Trie.NodeMgr nodeMgr = new Trie.NodeMgr();
+        private final LinkTrie.NodeMgr nodeMgr = new LinkTrie.NodeMgr();
         private Node node;
 
         @BeforeEach
