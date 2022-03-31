@@ -401,6 +401,26 @@ public class TestIntArray {
         }
     }
 
+    public static class ToArrayTest {
+        @BeforeEach
+        public void setUp() {
+            refreshArr();
+        }
+
+        @Test
+        public void nonEmptyArray_ShouldReturnArray() {
+            arr.insert(1);
+            arr.insert(2);
+            arr.insert(3);
+            assertArrayEquals(new int[] {1,2,3}, arr.toArray());
+        }
+
+        @Test
+        public void emptyArray_ShouldReturnEmptyArray() {
+            assertArrayEquals(new int[0], arr.toArray());
+        }
+    }
+
     public static class IteratorTest {
 
         @BeforeEach

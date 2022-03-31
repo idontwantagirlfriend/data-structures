@@ -214,6 +214,12 @@ public class Array<T> extends AbstractArray<T>{
         + "]";
     }
 
+    public T[] toArray() {
+        var result =  (T[]) new Object[bound + 1];
+        System.arraycopy(array, 0, result, 0, bound + 1);
+        return result;
+    }
+
     @Override
     public Iterator<T> iterator() {
         return new ArrayIterator();

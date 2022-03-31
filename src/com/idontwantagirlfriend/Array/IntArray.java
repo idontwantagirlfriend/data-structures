@@ -206,6 +206,12 @@ public class IntArray extends AbstractIntArray {
                 + "]";
     }
 
+    public int[] toArray() {
+        var result =  new int[bound + 1];
+        System.arraycopy(array, 0, result, 0, bound + 1);
+        return result;
+    }
+
     /**
      * Get an iterator instance of numbers.
      * @return An {@code IntIterator} instance
