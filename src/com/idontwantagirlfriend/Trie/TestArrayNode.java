@@ -22,17 +22,17 @@ public class TestArrayNode {
 
     @Test
     public void emptyNodeHasChild_ShouldReturnFalse() {
-        assertFalse(node.hasChild('b'));
+        assertFalse(node.contains('b'));
     }
 
     @Test
     public void hasNonExistentChild_ShouldReturnFalse() {
-        assertFalse(node.hasChild('b'));
+        assertFalse(node.contains('b'));
     }
 
     @Test
     public void hasIllegalCharacterChild_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> node.hasChild(' '));
+        assertThrows(IllegalArgumentException.class, () -> node.contains(' '));
     }
 
     @Test
@@ -48,31 +48,31 @@ public class TestArrayNode {
 
     @Test
     public void addOneChild() {
-        node.addChild('f');
+        node.add('f');
     }
 
     @Test
     public void addManyChildren() {
-        List.of('a','m','s').forEach(node::addChild);
+        List.of('a','m','s').forEach(node::add);
     }
 
     @Test
     public void addIllegalCharacterChild_ShouldThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> node.addChild(' '));
-        assertThrows(IllegalArgumentException.class, () -> node.addChild('A'));
+        assertThrows(IllegalArgumentException.class, () -> node.add(' '));
+        assertThrows(IllegalArgumentException.class, () -> node.add('A'));
     }
 
     @Test
     public void addOneHasOne_ShouldReturnTrue() {
-        node.addChild('m');
-        assertTrue(node.hasChild('m'));
+        node.add('m');
+        assertTrue(node.contains('m'));
     }
 
     @Test
     public void addRepetitiveCharAndGet_ShouldReturnDifferentChildObjectEachTime() {
-        node.addChild('k');
+        node.add('k');
         var oldChild = node.getChild('k');
-        node.addChild('k');
+        node.add('k');
         var newChild = node.getChild('k');
         assertEquals(oldChild.getLetter(), newChild.getLetter());
         assertNotSame(oldChild, newChild);
@@ -80,25 +80,25 @@ public class TestArrayNode {
 
     @Test
     public void emptyNodeHasNoChild_ShouldReturnTrue() {
-        assertTrue(node.hasNoChild());
+        assertTrue(node.isLeaf());
     }
 
     @Test
     public void addOneAndHasNoChild_ShouldReturnFalse() {
-        node.addChild('k');
-        assertFalse(node.hasNoChild());
+        node.add('k');
+        assertFalse(node.isLeaf());
     }
 
     @Test
     public void removeANonExistentChild_ShouldReturnNull() {
         assertNull(node.removeChild('k'));
-        node.addChild('k');
+        node.add('k');
         assertNull(node.removeChild('f'));
     }
 
     @Test
     public void removeAChild_ShouldReturnTheChild() {
-        node.addChild('k');
+        node.add('k');
         var removed = node.getChild('k');
         assertSame(removed, node.removeChild('k'));
     }
@@ -113,9 +113,9 @@ public class TestArrayNode {
 
     @Test
     public void getAllChildren_ReturnedArrayMustContainsAllChildren() {
-        node.addChild('o');
-        node.addChild('a');
-        node.addChild('b');
+        node.add('o');
+        node.add('a');
+        node.add('b');
 
         var allChildren = node.getAllChildren();
         var destArr = new ArrayNode[] {node.getChild('o'), node.getChild('a'), node.getChild('b')};

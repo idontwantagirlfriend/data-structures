@@ -1,13 +1,11 @@
 package com.idontwantagirlfriend.Trie;
 
-import com.idontwantagirlfriend.Array.Array;
-
 /** Deprecation warning:
  * This implementation does not take into account
  * non-alphabetical letters. It may be incompatible
  * with later implementations of Trie.
  */
-public class ArrayNode implements Node {
+public class ArrayNode implements CharNode {
     private final ArrayNode[] subtrees;
     private final int ALPHABET_NUMBER = 26;
     private char letter;
@@ -23,8 +21,7 @@ public class ArrayNode implements Node {
         this();
         this.letter = letter;
     }
-
-
+    
     private static int getLetterPosition(char letter) {
         return letter - 'a';
     }
@@ -47,12 +44,12 @@ public class ArrayNode implements Node {
     }
 
     @Override
-    public Boolean hasChild(char letter) {
+    public Boolean contains(char letter) {
         return getChild(letter) != null;
     }
 
     @Override
-    public Boolean hasNoChild() {
+    public Boolean isLeaf() {
         for (var i = 0; i < ALPHABET_NUMBER; i++) {
             if (subtrees[i] != null) return false;
         }
@@ -70,9 +67,10 @@ public class ArrayNode implements Node {
     }
 
     @Override
-    public ArrayNode addChild(char letter) {
+    public Boolean add(char letter) {
         var newChild = new ArrayNode(letter);
-        return setChild(letter, newChild);
+        setChild(letter, newChild);
+        return true;
     }
 
     @Override
@@ -80,9 +78,9 @@ public class ArrayNode implements Node {
         var allChildren = new ArrayNode[26];
         var cursor = -1;
 
-        for (var i = 0; i < subtrees.length; i++) {
-            if (subtrees[i] != null)
-                allChildren[++cursor] = subtrees[i];
+        for (ArrayNode subtree : subtrees) {
+            if (subtree != null)
+                allChildren[++cursor] = subtree;
         }
 
         return allChildren;

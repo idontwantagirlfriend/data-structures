@@ -1,12 +1,10 @@
 package com.idontwantagirlfriend.Trie;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-public class HashMapNode implements Node {
+public class HashMapNode implements CharNode {
 
-    private HashMap<Character, HashMapNode> subtrees;
+    private final HashMap<Character, HashMapNode> subtrees;
     private Boolean isEOW;
     private char letter;
 
@@ -32,13 +30,13 @@ public class HashMapNode implements Node {
     }
 
     @Override
-    public Boolean hasChild(char letter) {
+    public Boolean contains(char letter) {
         handleIllegalCharacter(letter);
         return subtrees.containsKey(letter);
     }
 
     @Override
-    public Boolean hasNoChild() {
+    public Boolean isLeaf() {
         return subtrees.isEmpty();
     }
 
@@ -48,11 +46,10 @@ public class HashMapNode implements Node {
     }
 
     @Override
-    public HashMapNode addChild(char letter) {
+    public Boolean add(char letter) {
         handleIllegalCharacter(letter);
-        var child = new HashMapNode(letter);
-        subtrees.put(letter, child);
-        return child;
+        subtrees.put(letter, new HashMapNode(letter));
+        return true;
     }
 
     @Override
@@ -63,8 +60,7 @@ public class HashMapNode implements Node {
         for (var entry : subtrees.entrySet()) {
             if (cursor >= allChildren.length - 1) {
                 var expanded = new HashMapNode[allChildren.length * 2];
-                for (var i = 0; i < allChildren.length; i++)
-                    expanded[i] = allChildren[i];
+                System.arraycopy(allChildren, 0, expanded, 0, allChildren.length);
                 allChildren = expanded;
             }
             allChildren[++cursor] = entry.getValue();

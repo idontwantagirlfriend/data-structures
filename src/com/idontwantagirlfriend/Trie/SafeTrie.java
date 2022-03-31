@@ -1,11 +1,9 @@
 package com.idontwantagirlfriend.Trie;
 
-public class LinkTrie {
-    private NodeMgr nodeMgr;
-    private Node root;
+public class SafeTrie {
+    private final CharNode root;
 
-    public LinkTrie(Node root) {
-        this.nodeMgr = new NodeMgr();
+    public SafeTrie(CharNode root) {
         this.root = root;
     }
 
@@ -21,10 +19,12 @@ public class LinkTrie {
         for (var i = 0; i < lowercase.length(); i++) {
             var letter = lowercase.charAt(i);
             handleIllegalCharacter(letter);
-            nodeMgr.safeAdd(cursor, letter);
-            cursor = nodeMgr.findChild(cursor, letter);
+            if (!cursor.contains(letter)) {
+                cursor.add(letter);
+            }
+            cursor = cursor.getChild(letter);
         }
-        nodeMgr.setIsEOW(cursor, true);
+        cursor.setEOW(true);
     }
 
     /**
@@ -40,18 +40,20 @@ public class LinkTrie {
         var cursor = root;
         for (var i = 0; i < lowercase.length() - 1; i++) {
             var letter = lowercase.charAt(i);
-            if (!cursor.hasChild(letter)) return null;
-            cursor = nodeMgr.findChild(cursor, letter);
+            if (!cursor.contains(letter)) return null;
+            cursor = cursor.getChild(letter);
         }
 
 //        word.length() > 1 has been ensured.
         var lastLetter = lowercase.charAt(word.length() - 1);
-        if (!cursor.hasChild(lastLetter)
-                || !nodeMgr.getIsEOW(nodeMgr.findChild(cursor, lastLetter)))
+        if (!cursor.contains(lastLetter)
+                || !cursor.getChild(lastLetter).getEOW())
             return null;
-        if (!nodeMgr.pruneChild(cursor, lastLetter))
-            nodeMgr.setIsEOW(nodeMgr.findChild(cursor, lastLetter), false);
-        nodeMgr.setIsEOW(cursor, false);
+
+        cursor.getChild(lastLetter).setEOW(false);
+        if (cursor.contains(lastLetter) && cursor.getChild(lastLetter).isLeaf()) {
+            cursor.removeChild(lastLetter);
+        }
         return word;
     }
 
@@ -69,10 +71,10 @@ public class LinkTrie {
         for (var i = 0; i < lowercase.length(); i++) {
             var letter = lowercase.charAt(i);
             handleIllegalCharacter(letter);
-            if (!cursor.hasChild(letter)) return false;
-            cursor = nodeMgr.findChild(cursor, letter);
+            if (!cursor.contains(letter)) return false;
+            cursor = cursor.getChild(letter);
         }
-        return nodeMgr.getIsEOW(cursor);
+        return cursor.getEOW();
     }
 
     private static void handleIllegalCharacter(char letter) {
@@ -89,36 +91,5 @@ public class LinkTrie {
         if (word.equals(""))
             throw new IllegalArgumentException(
                     "Trie can't operate with empty string.");
-    }
-
-    public static class NodeMgr {
-        public Boolean safeAdd(Node node, char letter) {
-            var success = false;
-            if (!node.hasChild(letter)) {
-                node.addChild(letter);
-                success = true;
-            }
-            return success;
-        }
-
-        public Node findChild(Node node, char letter) {
-            return node.getChild(letter);
-        }
-
-        public Boolean pruneChild(Node node, char letter) {
-            if (node.hasChild(letter) && node.getChild(letter).hasNoChild()) {
-                node.removeChild(letter);
-                return true;
-            }
-            return false;
-        }
-
-        public void setIsEOW(Node node, Boolean isEOW) {
-            node.setEOW(isEOW);
-        }
-
-        public Boolean getIsEOW(Node node) {
-            return node.getEOW();
-        }
     }
 }
