@@ -9,7 +9,7 @@ public interface CharNode {
 
     CharNode removeChild(char letter);
 
-    Boolean add(char letter);
+    void add(char letter);
 
     CharNode[] getAllChildren();
 

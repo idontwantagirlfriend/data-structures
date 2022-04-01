@@ -67,10 +67,9 @@ public class ArrayNode implements CharNode {
     }
 
     @Override
-    public Boolean add(char letter) {
+    public void add(char letter) {
         var newChild = new ArrayNode(letter);
         setChild(letter, newChild);
-        return true;
     }
 
     @Override

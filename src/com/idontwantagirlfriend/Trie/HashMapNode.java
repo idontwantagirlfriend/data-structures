@@ -46,10 +46,9 @@ public class HashMapNode implements CharNode {
     }
 
     @Override
-    public Boolean add(char letter) {
+    public void add(char letter) {
         handleIllegalCharacter(letter);
         subtrees.put(letter, new HashMapNode(letter));
-        return true;
     }
 
     @Override

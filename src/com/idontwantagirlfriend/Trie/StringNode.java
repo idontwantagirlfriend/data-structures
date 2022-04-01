@@ -9,7 +9,7 @@ public interface StringNode {
 
     StringNode remove(String substring);
 
-    Boolean add(String substring);
+    void add(String substring);
 
     StringNode[] getAllChildren();
 
