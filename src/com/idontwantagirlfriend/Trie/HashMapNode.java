@@ -54,29 +54,17 @@ public class HashMapNode implements CharNode {
 
     @Override
     public HashMapNode[] getAllChildren() {
-        var allChildren = new HashMapNode[5];
-        var cursor = -1;
-
-        for (var entry : subtrees.entrySet()) {
-            if (cursor >= allChildren.length - 1) {
-                var expanded = new HashMapNode[allChildren.length * 2];
-                System.arraycopy(allChildren, 0, expanded, 0, allChildren.length);
-                allChildren = expanded;
-            }
-            allChildren[++cursor] = entry.getValue();
-        }
-
-        return allChildren;
-    }
-
-    @Override
-    public void setEOW(Boolean isEOW) {
-        this.isEOW = isEOW;
+        return subtrees.values().toArray(HashMapNode[]::new);
     }
 
     @Override
     public Boolean getEOW() {
         return isEOW;
+    }
+
+    @Override
+    public void setEOW(Boolean isEOW) {
+        this.isEOW = isEOW;
     }
 
     private void handleIllegalCharacter(char letter) {
