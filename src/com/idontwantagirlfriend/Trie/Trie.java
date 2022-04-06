@@ -10,6 +10,8 @@ public class Trie {
     }
 
     public void add(String word) {
+        handleNullInput(word);
+
         var cursor = root;
         var lowercase = word.toLowerCase();
 
@@ -24,6 +26,8 @@ public class Trie {
     }
 
     public String remove(String word) {
+        handleNullInput(word);
+
         return remove(root, word.toLowerCase(), 1);
     }
 
@@ -49,6 +53,8 @@ public class Trie {
     }
 
     public Boolean find(String word) {
+        handleNullInput(word);
+
         var lowercase = word.toLowerCase();
         var cursor = root;
         for (var i = 1; i <= lowercase.length(); i++) {
@@ -97,5 +103,11 @@ public class Trie {
         var accumulator = new Array<String>();
         toArray(root, accumulator);
         return accumulator.toString();
+    }
+
+    private void handleNullInput(String input) {
+        if (input == null)
+            throw new IllegalArgumentException(
+                    "You can't input a null into the trie.");
     }
 }
