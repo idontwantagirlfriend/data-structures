@@ -104,6 +104,84 @@ public class TestTrie {
     }
 
     @Test
+    public void predictionOnEmptyTrie_ShouldReturnEmptyStringArray() {
+        assertArrayEquals(new String[0], trie.doPrediction("Hello"));
+    }
+
+    @Test
+    public void predictionOnEmptyTrieWithEmptyString_ShouldReturnEmptyStringArray() {
+        assertArrayEquals(new String[0], trie.doPrediction(""));
+    }
+
+    @Test
+    public void predictionOnExistingWord_ShouldReturnArrayContainingTheWord() {
+        trie.add("hello");
+        var predictions = trie.doPrediction("Hello");
+        assertEquals(1, predictions.length);
+        assertTrue(arrayContains(predictions, "hello"));
+    }
+
+    @Test
+    public void predictionOnPartOfExistingWord_ShouldReturnTheFullWord() {
+        trie.add("world");
+        var predictions = trie.doPrediction("worl");
+        assertEquals(1, predictions.length);
+        assertTrue(arrayContains(predictions, "world"));
+    }
+
+    @Test
+    public void predictionOnTrieWithMultipleWords() {
+        trie.add("Hello");
+        trie.add("hell");
+        trie.add("hellion");
+        trie.add("hellenic");
+        trie.add("helmet");
+        var predictions = trie.doPrediction("hell");
+        assertEquals(4, predictions.length);
+        assertTrue(arrayContains(predictions, "hello"));
+        assertTrue(arrayContains(predictions, "hell"));
+        assertTrue(arrayContains(predictions, "hellion"));
+        assertTrue(arrayContains(predictions, "hellenic"));
+    }
+
+    @Test
+    public void predictionOnTrieWithMultipleWords_PartOfWord() {
+        trie.add("Hello");
+        trie.add("hellion");
+        trie.add("hellenic");
+        trie.add("helmet");
+        var predictions = trie.doPrediction("hell");
+        assertEquals(3, predictions.length);
+        assertTrue(arrayContains(predictions, "hello"));
+        assertTrue(arrayContains(predictions, "hellion"));
+        assertTrue(arrayContains(predictions, "hellenic"));
+    }
+
+    @Test
+    public void predictionOnEmptyString_ShouldReturnAllWordsInTrie() {
+        trie.add("Hello");
+        trie.add("hellion");
+        trie.add("hellenic");
+        trie.add("helmet");
+        var predictions = trie.doPrediction("");
+        assertEquals(4, predictions.length);
+        assertTrue(arrayContains(predictions, "hello"));
+        assertTrue(arrayContains(predictions, "hellion"));
+        assertTrue(arrayContains(predictions, "hellenic"));
+        assertTrue(arrayContains(predictions, "helmet"));
+    }
+
+    @Test
+    public void predictionOnNull_ShouldThrowIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> trie.doPrediction(null));
+        trie.add("Hello");
+        trie.add("hellion");
+        trie.add("hellenic");
+        trie.add("helmet");
+        assertThrows(IllegalArgumentException.class, () -> trie.doPrediction(null));
+    }
+
+    @Test
     public void toArray() {
         trie.add("hello");
         trie.add("world");

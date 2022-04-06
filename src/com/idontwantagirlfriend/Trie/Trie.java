@@ -1,6 +1,7 @@
 package com.idontwantagirlfriend.Trie;
 
 import com.idontwantagirlfriend.Array.Array;
+import java.util.Arrays;
 
 public record Trie(StringNode root) {
 
@@ -26,20 +27,21 @@ public record Trie(StringNode root) {
         return remove(root, word.toLowerCase(), 1);
     }
 
-    private String remove(StringNode node, String word, int upperBound) {
+    private String remove(StringNode node, String word, int level) {
 
-        if (upperBound > word.length() && !word.equals("")) {
+        if (word.equals("")) return null;
+
+        if (level > word.length()) {
             node.setEOW(false);
             return node.getWord();
         }
-        var targetString = word.length() > 0
-                ? word.substring(0, upperBound)
-                : word;
+
+        var targetString = word.substring(0, level);
         var child = node.getChild(targetString);
 
         if (child == null) return null;
 
-        var removed = remove(child, word, upperBound + 1);
+        var removed = remove(child, word, level + 1);
 
         if (child.isLeaf())
             node.remove(targetString);
@@ -50,14 +52,8 @@ public record Trie(StringNode root) {
     public Boolean find(String word) {
         handleNullInput(word);
 
-        var lowercase = word.toLowerCase();
-        var cursor = root;
-        for (var i = 1; i <= lowercase.length(); i++) {
-            var targetString = lowercase.substring(0, i);
-            if (cursor.getChild(targetString) == null) return false;
-            cursor = cursor.getChild(targetString);
-        }
-        return cursor.getEOW();
+        var foundNode = goToNode(word.toLowerCase());
+        return foundNode != null && foundNode.getEOW();
     }
 
     public int count() {
@@ -78,26 +74,46 @@ public record Trie(StringNode root) {
         return acc;
     }
 
+    public String[] doPrediction(String prefix) {
+        handleNullInput(prefix);
+
+        var foundNode = goToNode(prefix.toLowerCase());
+        if (foundNode == null) return new String[0];
+
+        var predictions = new Array<String>();
+        if (foundNode.getEOW()) predictions.insert(foundNode.getWord());
+        getAllChildren(foundNode, predictions);
+        return predictions.toArray(new String[0]);
+    }
+
     public String[] toArray() {
         var accumulator = new Array<String>();
-        toArray(root, accumulator);
+        getAllChildren(root, accumulator);
         return accumulator.toArray(new String[0]);
     }
 
-    private void toArray(StringNode node, Array<String> accumulator) {
+    public String toString() {
+        return Arrays.toString(toArray());
+    }
+
+    private void getAllChildren(StringNode node, Array<String> accumulator) {
         for (var child : node.getAllChildren()) {
             if (child.getEOW()) accumulator.insert(child.getWord());
         }
 
         for (var child : node.getAllChildren()) {
-            toArray(child, accumulator);
+            getAllChildren(child, accumulator);
         }
     }
 
-    public String toString() {
-        var accumulator = new Array<String>();
-        toArray(root, accumulator);
-        return accumulator.toString();
+    private StringNode goToNode(String word) {
+        var cursor = root;
+        for (var i = 1; i <= word.length(); i++) {
+            var targetString = word.substring(0, i);
+            if (cursor.getChild(targetString) == null) return null;
+            cursor = cursor.getChild(targetString);
+        }
+        return cursor;
     }
 
     private void handleNullInput(String input) {
