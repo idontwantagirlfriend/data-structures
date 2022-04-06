@@ -10,7 +10,7 @@ public class TestQueue {
 
     @BeforeEach
     public void setUp() {
-        queue = new Queue<>();
+        queue = new ArrayQueue<>();
     }
 
     @Test

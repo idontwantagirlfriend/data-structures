@@ -11,13 +11,13 @@ public class LinearGrowingArray<T> extends Array<T>{
     public LinearGrowingArray(int step) {
         this.step = this.size = step;
         this.bound = -1;
-        this.array = (T[]) new Object[size];
+        this.array = new Object[size];
     }
 
     @Override
     protected void expand() {
         this.size += step;
-        var newArray = (T[]) new Object[size];
+        var newArray = new Object[size];
         System.arraycopy(this.array, 0, newArray, 0, bound + 1);
         this.array = newArray;
     }

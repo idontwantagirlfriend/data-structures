@@ -1,6 +1,6 @@
 package com.idontwantagirlfriend.Array;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,7 +14,7 @@ import java.util.stream.Stream;
  */
 public class Array<T> extends AbstractArray<T>{
 
-    protected T[] array;
+    protected Object[] array;
     protected int size;
     protected int bound;
     /**
@@ -26,7 +26,7 @@ public class Array<T> extends AbstractArray<T>{
     public Array() {
         this.size = 5;
         this.bound = -1;
-        this.array = (T[]) new Object[size];
+        this.array = new Object[size];
     }
 
 /**
@@ -35,10 +35,11 @@ public class Array<T> extends AbstractArray<T>{
  * O(1) time complexity.
  * @return the inserted {@code element}.
  */
+    @SuppressWarnings("unchecked")
     @Override
     public T insert(T element) {
         expandWhenFull();
-        return set(++bound, element);
+        return (T)set(++bound, element);
     }
 
     /**
@@ -49,6 +50,7 @@ public class Array<T> extends AbstractArray<T>{
      * @throws IllegalStateException on negative index
      * @throws IndexOutOfBoundsException on excessive index
      */
+    @SuppressWarnings("unchecked")
     @Override
     public T replace(int index, T element) {
         handleNegativeIndex(index);
@@ -56,7 +58,7 @@ public class Array<T> extends AbstractArray<T>{
 
         var replaced = array[index];
         set(index, element);
-        return replaced;
+        return (T)replaced;
     }
 
     /**
@@ -67,6 +69,7 @@ public class Array<T> extends AbstractArray<T>{
      * @throws IllegalStateException on negative index
      * @throws IndexOutOfBoundsException on excessive index
      */
+    @SuppressWarnings("unchecked")
     @Override
     public T insertBefore(int index, T element) {
         handleNegativeIndex(index);
@@ -77,7 +80,7 @@ public class Array<T> extends AbstractArray<T>{
         expandWhenFull();
         for (var i = ++bound; i > index; i--)
             set(i, array[i - 1]);
-        return set(index, element);
+        return (T)set(index, element);
     }
 
     /**
@@ -94,7 +97,7 @@ public class Array<T> extends AbstractArray<T>{
         handleOutOfBoundException(index);
         var removed = get(index);
 
-        var newArray = (T[])new Object[size = bound];
+        var newArray = new Object[size = bound];
         for (var i = 0; i <= bound; i++) {
             if (i < index) newArray[i] = get(i);
             if (i > index) newArray[i - 1] = get(i);
@@ -134,11 +137,12 @@ public class Array<T> extends AbstractArray<T>{
      * @throws IllegalStateException on negative index
      * @throws IndexOutOfBoundsException on excessive index
      */
+    @SuppressWarnings("unchecked")
     @Override
     public T get(int index) {
         handleNegativeIndex(index);
         handleOutOfBoundException(index);
-        return array[index];
+        return (T)array[index];
     }
 
     /**
@@ -214,10 +218,13 @@ public class Array<T> extends AbstractArray<T>{
         + "]";
     }
 
-    public T[] toArray() {
-        var result =  (T[]) new Object[bound + 1];
-        System.arraycopy(array, 0, result, 0, bound + 1);
-        return result;
+    public Object[] toArray() {
+        return toArray(new Object[0]);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
+        return (T[])Arrays.copyOf(array, bound + 1, a.getClass());
     }
 
     @Override
@@ -227,7 +234,7 @@ public class Array<T> extends AbstractArray<T>{
 
     protected void expand() {
         this.size *= 2;
-        var newArray = (T[]) new Object[size];
+        var newArray = new Object[size];
         System.arraycopy(this.array, 0, newArray, 0, bound + 1);
         this.array = newArray;
     }
@@ -245,7 +252,7 @@ public class Array<T> extends AbstractArray<T>{
     }
 
 
-    private T set(int index, T element) {
+    private Object set(int index, Object element) {
         if (index >= size) throw new IllegalArgumentException();
         array[index] = element;
         return element;
@@ -264,9 +271,10 @@ public class Array<T> extends AbstractArray<T>{
             return this.cursor < bound;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public T next() {
-            return array[++this.cursor];
+            return (T)array[++this.cursor];
         }
     }
 }

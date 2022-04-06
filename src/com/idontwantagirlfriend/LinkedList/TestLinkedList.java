@@ -11,7 +11,7 @@ public class TestLinkedList {
     private static AbstractLinkedList<Integer> list;
 
     private static void refreshList() {
-        list = new LinkedList<>();
+        list = new ArrayLinkedList<>();
     }
 
     public static class AddTest {

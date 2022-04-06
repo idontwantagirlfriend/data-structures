@@ -128,6 +128,7 @@ public class ArrayLinkedList<T> extends AbstractLinkedList<T> {
                             + position
                             + "while the maximum index is"
                             + size());
+        this.length--;
         return items.removeAt(position);
     }
 

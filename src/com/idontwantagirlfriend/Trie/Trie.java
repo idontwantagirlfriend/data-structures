@@ -11,9 +11,10 @@ public class Trie {
 
     public void add(String word) {
         var cursor = root;
+        var lowercase = word.toLowerCase();
 
-        for (var i = 1; i <= word.length(); i++) {
-            var content = word.substring(0, i);
+        for (var i = 1; i <= lowercase.length(); i++) {
+            var content = lowercase.substring(0, i);
             if (cursor.getChild(content) == null)
                 cursor.add(content);
             cursor = cursor.getChild(content);
@@ -22,34 +23,36 @@ public class Trie {
         if (cursor != root && !cursor.getEOW()) cursor.setEOW(true);
     }
 
-    public Boolean remove(String word) {
-        return remove(root, word, 1);
+    public String remove(String word) {
+        return remove(root, word.toLowerCase(), 1);
     }
 
-    private Boolean remove(StringNode node, String word, int upperBound) {
+    private String remove(StringNode node, String word, int upperBound) {
 
-        if (upperBound > word.length()) {
+        if (upperBound > word.length() && !word.equals("")) {
             node.setEOW(false);
-        } else {
-            var targetString = word.substring(0, upperBound);
-            var child = node.getChild(targetString);
-
-            if (child == null) return false;
-
-            remove(child, word, upperBound + 1);
-
-            if (child.isLeaf())
-                node.remove(targetString);
+            return node.getWord();
         }
+        var targetString = word.length() > 0
+                                ? word.substring(0, upperBound)
+                                : word;
+        var child = node.getChild(targetString);
 
-        return true;
+        if (child == null) return null;
+
+        var removed = remove(child, word, upperBound + 1);
+
+        if (child.isLeaf())
+            node.remove(targetString);
+
+        return removed;
     }
 
     public Boolean find(String word) {
         var lowercase = word.toLowerCase();
         var cursor = root;
         for (var i = 1; i <= lowercase.length(); i++) {
-            var targetString = word.substring(0, i);
+            var targetString = lowercase.substring(0, i);
             if (cursor.getChild(targetString) == null) return false;
             cursor = cursor.getChild(targetString);
         }
@@ -74,25 +77,25 @@ public class Trie {
         return acc;
     }
 
-    public String[] getAllWords() {
+    public String[] toArray() {
         var accumulator = new Array<String>();
-        getAllWords(root, accumulator);
-        return accumulator.toArray();
+        toArray(root, accumulator);
+        return accumulator.toArray(new String[0]);
     }
 
-    private void getAllWords(StringNode node, Array<String> accumulator) {
+    private void toArray(StringNode node, Array<String> accumulator) {
         for (var child : node.getAllChildren()) {
             if (child.getEOW()) accumulator.insert(child.getWord());
         }
 
         for (var child : node.getAllChildren()) {
-            getAllWords(child, accumulator);
+            toArray(child, accumulator);
         }
     }
 
     public String toString() {
         var accumulator = new Array<String>();
-        getAllWords(root, accumulator);
+        toArray(root, accumulator);
         return accumulator.toString();
     }
 }
