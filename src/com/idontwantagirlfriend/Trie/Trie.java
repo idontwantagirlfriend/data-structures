@@ -2,12 +2,7 @@ package com.idontwantagirlfriend.Trie;
 
 import com.idontwantagirlfriend.Array.Array;
 
-public class Trie {
-    private final StringNode root;
-
-    public Trie(StringNode root) {
-        this.root = root;
-    }
+public record Trie(StringNode root) {
 
     public void add(String word) {
         handleNullInput(word);
@@ -38,8 +33,8 @@ public class Trie {
             return node.getWord();
         }
         var targetString = word.length() > 0
-                                ? word.substring(0, upperBound)
-                                : word;
+                ? word.substring(0, upperBound)
+                : word;
         var child = node.getChild(targetString);
 
         if (child == null) return null;
