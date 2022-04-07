@@ -2,11 +2,11 @@ package com.idontwantagirlfriend.Graph;
 
 import java.util.HashMap;
 
-public class DoubleStorageDirectedGraph {
+public class UndirectedGraph {
     private final HashMap<String, Node> index;
     private final HashMap<Node, HashMap<Node, Integer>> relationships;
 
-    public DoubleStorageDirectedGraph() {
+    public UndirectedGraph() {
         this.index = new HashMap<>();
         this.relationships = new HashMap<>();
     }

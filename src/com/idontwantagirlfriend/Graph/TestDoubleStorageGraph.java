@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDoubleStorageGraph {
-    private DoubleStorageDirectedGraph graph;
+    private UndirectedGraph graph;
     @BeforeEach
     public void refreshGraph() {
-        graph = new DoubleStorageDirectedGraph();
+        graph = new UndirectedGraph();
     }
 
     @Test
