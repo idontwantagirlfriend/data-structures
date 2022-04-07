@@ -1,14 +1,13 @@
 package com.idontwantagirlfriend.Graph;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public class UndirectedGraph {
     private final HashMap<String, Node> index;
-    private final HashMap<Node, HashMap<Node, Integer>> relationships;
 
     public UndirectedGraph() {
         this.index = new HashMap<>();
-        this.relationships = new HashMap<>();
     }
 
     /**
@@ -20,7 +19,6 @@ public class UndirectedGraph {
     public Boolean addNode(String name) {
         if (nameExistsInIndex(name)) return false;
         var node = new Node(name);
-        addNewNodeToRelationships(node);
         addToIndex(name, node);
         return true;
     }
@@ -33,7 +31,7 @@ public class UndirectedGraph {
      */
     public Boolean removeNode(String name) {
         if (!nameExistsInIndex(name)) return false;
-        removeNodeFromRelationships(getNodeByName(name));
+        getAllNodes().forEach(eachNode -> eachNode.removeEdgeTo(getNodeByName(name)));
         removeFromIndex(name);
         return true;
     }
@@ -52,13 +50,9 @@ public class UndirectedGraph {
         if (!namesInIndex) return false;
         var fromNode = getNodeByName(from);
         var toNode = getNodeByName(to);
-        var edgeCanBeAdded
-                = nodeExistsInRelationships(fromNode)
-                && nodeExistsInRelationships(toNode)
-                && getEdgeLength(fromNode, toNode) == null;
-        if (edgeCanBeAdded)
-            addEdgeToRelationships(getNodeByName(from), getNodeByName(to), length);
-        return edgeCanBeAdded;
+        if (fromNode.getEdgeLength(toNode) != null) return false;
+        getNodeByName(from).addEdgeTo(getNodeByName(to), length);
+        return true;
     }
 
     /**
@@ -69,7 +63,7 @@ public class UndirectedGraph {
      */
     public Boolean removeEdge(String from, String to) {
         if (!edgeExists(from, to)) return false;
-        removeEdgeFromRelationships(getNodeByName(from), getNodeByName(to));
+        getNodeByName(from).removeEdgeTo(getNodeByName(to));
         return true;
     }
 
@@ -84,63 +78,59 @@ public class UndirectedGraph {
      */
     public Integer getEdge(String from, String to) {
         return edgeExists(from, to)
-                ? getEdgeLength(getNodeByName(from), getNodeByName(to))
+                ? getNodeByName(from).getEdgeLength(getNodeByName(to))
                 : null;
     }
 
     private Boolean edgeExists(String from, String to) {
         var namesInIndex
                 = nameExistsInIndex(from) && nameExistsInIndex(to);
-        var fromNode = getNodeByName(from);
-        var toNode = getNodeByName(to);
-        var nodesInRelationships
-                = nodeExistsInRelationships(fromNode)
-                && nodeExistsInRelationships(toNode);
-        return namesInIndex && nodesInRelationships && getEdgeLength(fromNode, toNode) != null;
+        return namesInIndex && getNodeByName(from).getEdgeLength(getNodeByName(to)) != null;
     }
 
     private void addToIndex(String name, Node node) {
         index.put(name, node);
     }
 
-    private void addNewNodeToRelationships(Node node) {
-        relationships.put(node, new HashMap<>());
-    }
-
-    private void addEdgeToRelationships(Node from, Node to, int distance) {
-        relationships.get(from).put(to, distance);
-    }
-
     private void removeFromIndex(String name) {
         index.remove(name);
     }
 
-    private void removeNodeFromRelationships(Node node) {
-        relationships.remove(node);
-        relationships.values().forEach(map -> map.remove(node));
-    }
-
-    private void removeEdgeFromRelationships(Node from, Node to) {
-        relationships.get(from).remove(to);
-    }
-
-
     private Boolean nameExistsInIndex(String name) {
         return index.containsKey(name);
-    }
-
-    private Boolean nodeExistsInRelationships(Node node) {
-        return relationships.containsKey(node);
     }
 
     private Node getNodeByName(String name) {
         return index.get(name);
     }
 
-    private Integer getEdgeLength(Node from, Node to) {
-        return relationships.get(from).get(to);
+    private Collection<Node> getAllNodes() {
+        return index.values();
     }
 
-    private record Node(String name) {
+    private static final class Node {
+        private final String name;
+        private final HashMap<Node, Integer> edges;
+
+        private Node(String name) {
+            this.name = name;
+            this.edges = new HashMap<>();
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public void addEdgeTo(Node to, int distance) {
+            edges.put(to, distance);
+        }
+
+        public void removeEdgeTo(Node node) {
+            edges.remove(node);
+        }
+
+        public Integer getEdgeLength(Node to) {
+            return edges.get(to);
+        }
     }
 }
