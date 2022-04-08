@@ -1,11 +1,12 @@
 package com.idontwantagirlfriend.LinkedList;
 
+import java.util.Iterator;
 import java.util.function.Function;
 
 /**
  * An implementation of linked list for int type.
  */
-public class IntLinkedList extends AbstractIntLinkedList {
+public class IntLinkedList extends AbstractIntLinkedList implements Iterable<Integer> {
     private Node first;
     private Node last;
 
@@ -304,14 +305,14 @@ public class IntLinkedList extends AbstractIntLinkedList {
         }
     }
 
-    public class IntIterator {
+    public class IntIterator implements Iterator<Integer> {
         private Node current;
 
-        public Boolean hasNext() {
+        public boolean hasNext() {
             return current == null ? first != null : current.hasNext();
         }
 
-        public int next() {
+        public Integer next() {
             current = (current == null) ? first : current.getNext();
 
             return current.get();
