@@ -78,7 +78,7 @@ public class AVLTree<E extends Comparable<E>> implements Tree<E> {
      */
     private void rotateWhenNeeded(Node node, Consumer<Node> parentRebind) {
         if (balanceFactor(node) > 1) {
-            if (balanceFactor(node.getLeft()) > 0) {
+            if (balanceFactor(node.getLeft()) >= 0) {
                 performLLOn(node, parentRebind);
             } else {
                 performLROn(node, parentRebind);
